@@ -1,5 +1,7 @@
 import os
+from pathlib import Path
 from typing import Literal
+from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -13,9 +15,11 @@ class Config(BaseSettings):
 class LocalConfig(Config):
     mode: Literal["local"] = "local"
 
+    prompt_dir: Path = Field(default=Path(__file__).parent.parent / "prompts")
+
 
 class ServerConfig(Config):
     mode: Literal["server"] = "server"
 
 
-config = LocalConfig() if os.getenv("DOC81_MODE") == "local" else ServerConfig()
+config = LocalConfig() if os.getenv("DOC81_MODE") != "server" else ServerConfig()

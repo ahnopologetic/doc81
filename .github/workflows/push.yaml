@@ -35,4 +35,4 @@ jobs:
 
       - name: Run tests
         run: |
-          uv run python -m pytest
+          uv run --all-groups python -m pytest

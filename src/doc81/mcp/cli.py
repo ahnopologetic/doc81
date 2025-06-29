@@ -21,16 +21,16 @@ def setup(
         cursor_rules_dir.mkdir(parents=True, exist_ok=True)
 
         import urllib.request
-        
+
         try:
             url = "https://raw.githubusercontent.com/ahnopologetic/doc_81/refs/heads/main/prompts/doc81.prompt.md"
             with urllib.request.urlopen(url) as response:
-                prompt_content = response.read().decode('utf-8')
-            
+                prompt_content = response.read().decode("utf-8")
+
             cursor_rule_file = cursor_rules_dir / "doc81.mdc"
             with open(cursor_rule_file, "w") as f:
                 f.write(prompt_content)
-            
+
             print(f"Created Cursor rule: {cursor_rule_file}")
         except Exception as e:
             print(f"Error downloading prompt content: {e}")
@@ -38,14 +38,16 @@ def setup(
             if prompt_file.exists():
                 with open(prompt_file, "r") as f:
                     prompt_content = f.read()
-                
+
                 cursor_rule_file = cursor_rules_dir / "doc81.mdc"
                 with open(cursor_rule_file, "w") as f:
                     f.write(prompt_content)
-                
+
                 print(f"Created Cursor rule from local file: {cursor_rule_file}")
             else:
-                print("Warning: Failed to download prompt content and local prompts/doc81.prompt.md not found. Do nothing")
+                print(
+                    "Warning: Failed to download prompt content and local prompts/doc81.prompt.md not found. Do nothing"
+                )
     elif mode == Mode.VSCODE:
         print("Setting up VSCode...")
     elif mode == Mode.CLAUDE_DESKTOP:

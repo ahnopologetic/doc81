@@ -22,4 +22,6 @@ class ServerConfig(Config):
     mode: Literal["server"] = "server"
 
 
-config = LocalConfig() if os.getenv("DOC81_MODE") != "server" else ServerConfig()
+config = (
+    LocalConfig() if os.getenv("DOC81_MODE", "local") != "server" else ServerConfig()
+)

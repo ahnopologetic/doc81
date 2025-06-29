@@ -17,12 +17,12 @@ def mcp_tool_from_service(service_func: Callable) -> Callable:
     )
 
 
-@mcp.tool
+@mcp_tool_from_service
 def list_templates() -> list[str]:
     return service.list_templates()
 
 
-@mcp.tool
+@mcp_tool_from_service
 def get_template(path_or_ref: str) -> dict[str, str | list[str]]:
     return service.get_template(path_or_ref)
 

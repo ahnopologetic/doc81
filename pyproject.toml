@@ -1,6 +1,6 @@
 [project]
 name = "doc81"
-version = "0.1.0"
+version = "0.1.1"
 description = "A tool to help you write better documentation"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -8,6 +8,8 @@ dependencies = [
     "pydantic>=2.11.7",
     "pydantic-settings>=2.10.1",
     "python-frontmatter>=1.1.0",
+    "fastmcp>=2.9.2",
+    "typer>=0.16.0",
 ]
 classifiers = [
     "Development Status :: 3 - Alpha",
@@ -30,10 +32,6 @@ doc81-mcp-cli = "doc81.mcp.cli:app"
 [dependency-groups]
 dev = [
     "pytest>=8.4.1",
-]
-mcp = [
-    "fastmcp>=2.9.2",
-    "typer>=0.16.0",
 ]
 
 [build-system]

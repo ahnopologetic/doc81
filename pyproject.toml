@@ -12,6 +12,7 @@ dependencies = [
 
 [project.scripts]
 doc81-mcp = "doc_81.mcp.main:main"
+doc81-mcp-cli = "doc_81.mcp.cli:app"
 
 [dependency-groups]
 dev = [
@@ -19,6 +20,7 @@ dev = [
 ]
 mcp = [
     "fastmcp>=2.9.2",
+    "typer>=0.16.0",
 ]
 
 [build-system]

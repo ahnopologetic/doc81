@@ -1,9 +1,11 @@
 from pathlib import Path
+
 import pytest
-from doc_81.core.config import LocalConfig, ServerConfig
-from doc_81.core.exception import Doc81ServiceException
-from doc_81.service.get_template import get_template
-from doc_81.service.list_templates import list_templates
+
+from doc81.core.config import LocalConfig, ServerConfig
+from doc81.core.exception import Doc81ServiceException
+from doc81.service.get_template import get_template
+from doc81.service.list_templates import list_templates
 from tests.utils import override_env
 
 
@@ -35,7 +37,6 @@ def test_get_template_from_path_raise_error_if_name_is_not_in_frontmatter():
         DOC81_MODE="local",
         DOC81_PROMPT_DIR=str(Path(__file__).parent / "data"),
     ):
-        test_config = LocalConfig()
         with pytest.raises(Doc81ServiceException) as e:
             get_template(
                 str(Path(__file__).parent / "data" / "fail" / "runbook.non-template.md")

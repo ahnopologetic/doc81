@@ -1,6 +1,6 @@
 from typing import Callable
 from fastmcp import FastMCP
-from doc_81 import service
+from doc81 import service
 
 mcp = FastMCP("Doc81 🚀")
 

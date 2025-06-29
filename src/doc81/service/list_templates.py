@@ -1,5 +1,5 @@
-from doc_81.core.config import Config, config as global_config
-from doc_81.service.get_template import get_template
+from doc81.core.config import Config, config as global_config
+from doc81.service.get_template import get_template
 
 
 def list_templates(config: Config | None = None) -> list[dict[str, str | list[str]]]:

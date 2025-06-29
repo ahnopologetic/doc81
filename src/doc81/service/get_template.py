@@ -1,7 +1,7 @@
 from pathlib import Path
-from doc_81.core.config import Config, LocalConfig, config as global_config
-from doc_81.core.exception import Doc81ServiceException
-from doc_81.core.schema import Doc81Template
+from doc81.core.config import Config, LocalConfig, config as global_config
+from doc81.core.exception import Doc81ServiceException
+from doc81.core.schema import Doc81Template
 import frontmatter
 
 

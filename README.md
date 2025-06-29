@@ -27,16 +27,13 @@ cd doc-81
 
 2. Install dependencies
 ```bash
-# Using pip
 pip install -e .
-
-# Using pipenv
-pipenv install
+pip install doc81
 ```
 
 3. Run the MCP server
 ```bash
-python -m doc_81.mcp.main
+uvx doc81-mcp
 ```
 
 ## Usage
@@ -66,7 +63,7 @@ Doc81 provides two main functions:
 #### Python API
 
 ```python
-from doc_81 import service
+from doc81 import service
 
 # List all templates
 templates = service.list_templates()

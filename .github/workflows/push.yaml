@@ -1,0 +1,38 @@
+name: Push
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install uv with caching
+        uses: astral-sh/setup-uv@v5
+        with:
+          version: "0.6.16"
+          enable-cache: true
+          cache-dependency-glob: "pyproject.toml"
+
+      - name: lint
+        run: |
+          uvx ruff check --fix
+          uvx ruff format --check
+
+      - name: Run tests
+        run: |
+          uv run python -m pytest

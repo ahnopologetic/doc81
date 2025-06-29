@@ -1,4 +1,4 @@
-from doc_81.mcp.cli import app
+from doc81.mcp.cli import app
 from typer.testing import CliRunner
 
 

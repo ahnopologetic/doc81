@@ -10,9 +10,15 @@ dependencies = [
     "python-frontmatter>=1.1.0",
 ]
 
+[project.scripts]
+doc81-mcp = "doc_81.mcp.main:main"
+
 [dependency-groups]
 dev = [
     "pytest>=8.4.1",
+]
+mcp = [
+    "fastmcp>=2.9.2",
 ]
 
 [build-system]

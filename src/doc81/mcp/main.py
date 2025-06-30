@@ -1,5 +1,7 @@
 from typing import Callable
+
 from fastmcp import FastMCP
+
 from doc81 import service
 
 mcp = FastMCP("Doc81 🚀")
@@ -15,6 +17,12 @@ def mcp_tool_from_service(service_func: Callable) -> Callable:
         description=service_func.__doc__,
         name=service_func.__name__,
     )
+
+
+# TODO: add only for ENV=dev
+# @mcp.tool
+# def get_config() -> dict[str, str]:
+#     return config.model_dump()
 
 
 @mcp_tool_from_service

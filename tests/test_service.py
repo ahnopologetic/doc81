@@ -17,7 +17,7 @@ def test_list_templates():
         test_config = LocalConfig()
         templates = list_templates(test_config)
     assert len(templates) > 0
-    assert "runbook.template.md" in [template["path"] for template in templates][0]
+    assert any("runbook.template.md" in template for template in templates)
 
 
 def test_list_templates_raise_error_in_server_mode():
@@ -29,7 +29,7 @@ def test_list_templates_raise_error_in_server_mode():
 
 def test_get_template_from_url():
     with pytest.raises(Doc81ServiceException):
-        get_template("https://example.com/template.md", LocalConfig())
+        get_template("https://example.com/template.md", LocalConfig(mode="local"))
 
 
 def test_get_template_from_path_raise_error_if_name_is_not_in_frontmatter():

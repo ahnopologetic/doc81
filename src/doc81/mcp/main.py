@@ -35,6 +35,16 @@ def get_template(path_or_ref: str) -> dict[str, str | list[str]]:
     return service.get_template(path_or_ref)
 
 
+@mcp.resource(
+    "template://{path_or_ref*}/latest",
+    description="Get a template by path or reference",
+)
+def get_template_resource(path_or_ref: str) -> str:
+    tpl = service.get_template(path_or_ref)
+
+    return open(tpl["path"]).read()
+
+
 def main():
     mcp.run()
 

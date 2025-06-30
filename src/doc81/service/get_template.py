@@ -32,7 +32,11 @@ def _get_template_from_url(url: str, config: Config) -> Doc81Template:
 
 
 def _get_template_from_path(path: str, config: LocalConfig) -> Doc81Template:
-    ppath = Path(config.prompt_dir / path)
+    try:
+        ppath = Path(config.prompt_dir / path)
+    except FileNotFoundError:
+        raise Doc81ServiceException(f"Template not found: {path}")
+
     with open(ppath, "r") as f:
         content = f.read()
 

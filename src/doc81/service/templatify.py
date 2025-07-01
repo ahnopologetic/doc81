@@ -1,7 +1,8 @@
-from typing import Any, Literal
+from typing import Any, Literal, Optional
 import mistune
 import mistune.renderers
 import mistune.renderers.markdown
+import os
 from pydantic import BaseModel
 
 
@@ -16,6 +17,7 @@ class TemplatifyContext(BaseModel):
     verbosity: Literal["full", "compact", "outline"] = "full"
     frontmatter_dict: dict[str, str | list[str]] | None = None
     counters: dict[str, int] = {}
+    preserve_headings: bool = True
 
 
 def templatify(
@@ -24,6 +26,7 @@ def templatify(
     token_style: Literal["bracket", "curly"] = "bracket",
     verbosity: Literal["full", "compact", "outline"] = "full",
     frontmatter_dict: dict[str, str | list[str]] | None = None,
+    preserve_headings: bool = True,
 ) -> str:
     """
     Templatify a markdown file.
@@ -33,6 +36,7 @@ def templatify(
         token_style: The style of tokens to use. "bracket" for [Item 1], [Item 2], etc. "curly" for {{Item 1}}, {{Item 2}}, etc.
         verbosity: The verbosity of the output. "full" for full output, "compact" for compact output, "outline" for outline output.
         frontmatter_dict: The dictionary of frontmatter variables.
+        preserve_headings: Whether to preserve heading content or replace with tokens.
 
     Returns:
         str: The templatified markdown file.
@@ -47,49 +51,114 @@ def templatify(
         token_style=token_style,
         verbosity=verbosity,
         frontmatter_dict=frontmatter_dict,
+        preserve_headings=preserve_headings,
     )
 
-    templated_ast = [_rewrite(node, ctx) for node in ast]
-    return _render(templated_ast, ctx)
+    templated_ast = [_rewrite(node, ctx) for node in ast if node is not None]
+    templated_ast = [node for node in templated_ast if node is not None]
+    result = _render(templated_ast, ctx)
+
+    # Ensure result ends with a newline
+    if not result.endswith("\n"):
+        result += "\n"
+
+    return result
 
 
-def _rewrite(node: dict[str, Any], ctx: TemplatifyContext) -> dict[str, Any]:
+def _rewrite(node: dict[str, Any], ctx: TemplatifyContext) -> Optional[dict[str, Any]]:
+    if node is None:
+        return None
+
     type_ = node["type"]
 
     match type_:
         case "heading":
-            if ctx.verbosity == "outline" and node.get("attrs", {}).get("level", 1) > 3:
+            level = node.get("attrs", {}).get("level", 1)
+            if ctx.verbosity == "outline" and level > 3:
                 return None  # prune deep headings
-            node["children"] = [_rewrite(c, ctx) for c in node.get("children", [])]
-            return node
+
+            # Always preserve headings content
+            if ctx.preserve_headings:
+                node["children"] = [
+                    _rewrite(c, ctx) for c in node.get("children", []) if c is not None
+                ]
+                return node
+            else:
+                # Optional: replace heading content with tokens
+                return _make_token(f"Heading{level}", ctx)
+
         case "paragraph":
+            # Check if paragraph contains only text or has complex content
             has_other_than_text = any(
                 c["type"] != "text" for c in node.get("children", [])
             )
+
+            # Replace simple paragraphs with tokens
             if not has_other_than_text:
                 return _make_token("Paragraph", ctx)
-            node["children"] = [_rewrite(c, ctx) for c in node.get("children", [])]
-            return node
-        case "list":
+
+            # Process complex paragraphs recursively
             node["children"] = [
-                _make_token("Item", ctx) if c["type"] == "list_item" else c
-                for c in node.get("children", [])
+                _rewrite(c, ctx) for c in node.get("children", []) if c is not None
             ]
             return node
+
+        case "list":
+            # Process list items
+            processed_children = []
+            for child in node.get("children", []):
+                if child["type"] == "list_item":
+                    # Replace list items with tokens
+                    processed_children.append(_make_token("Item", ctx))
+                else:
+                    # Process other list elements
+                    processed_child = _rewrite(child, ctx)
+                    if processed_child:
+                        processed_children.append(processed_child)
+
+            node["children"] = processed_children
+            return node
+
+        case "list_item":
+            # Process nested lists within list items
+            has_nested_list = any(c["type"] == "list" for c in node.get("children", []))
+
+            if has_nested_list:
+                # Process children to handle nested lists
+                node["children"] = [
+                    _rewrite(c, ctx) for c in node.get("children", []) if c is not None
+                ]
+                return node
+            else:
+                # Replace simple list items with tokens
+                return _make_token("Item", ctx)
+
         case "block_code":
-            return _make_token("Code", ctx)
+            # Create a simple block text node with code fence
+            token_text = _create_code_token_text("Code", ctx)
+            return {
+                "type": "block_text",
+                "children": [{"type": "text", "raw": f"```\n{token_text}\n```"}],
+            }
+
         case "image":
             return _make_token("Image", ctx)
+
         case "link":
             return _make_token("Link", ctx)
+
         case "table" | "block_quote":
             return _make_token(type_.capitalize(), ctx)
+
         case "blank_line":
-            return {
-                "type": "blank_line"
-            }  # mistune.renderers.markdown.MarkdownRenderer():L79
+            return {"type": "blank_line"}
+
         case _:
-            node["children"] = [_rewrite(c, ctx) for c in node.get("children", [])]
+            # Process other node types recursively
+            if "children" in node:
+                node["children"] = [
+                    _rewrite(c, ctx) for c in node.get("children", []) if c is not None
+                ]
             return node
 
 
@@ -97,13 +166,8 @@ def _make_token(token_type: str, ctx: TemplatifyContext) -> dict[str, Any]:
     if token_type not in ctx.counters:
         ctx.counters[token_type] = 0
 
-    n = ctx.counters[token_type]
-    ctx.counters[token_type] = n + 1
-    if token_type == "Code":
-        token_text = f"```\n[{token_type} {ctx.counters[token_type]}]\n```"
-        return {"type": "block_text", "children": [{"type": "text", "raw": token_text}]}
-    else:
-        token_text = f"{token_type} {ctx.counters[token_type]}"
+    ctx.counters[token_type] += 1
+    token_text = f"{token_type} {ctx.counters[token_type]}"
 
     if ctx.token_style == "curly":
         token_text = f"{{{{{token_text}}}}}"  # → {{Paragraph 1}}
@@ -118,8 +182,22 @@ def _make_token(token_type: str, ctx: TemplatifyContext) -> dict[str, Any]:
     }
 
 
+def _create_code_token_text(token_type: str, ctx: TemplatifyContext) -> str:
+    """Helper function to create code token text."""
+    if token_type not in ctx.counters:
+        ctx.counters[token_type] = 0
+
+    ctx.counters[token_type] += 1
+
+    # Create the token text
+    token_text = f"{token_type} {ctx.counters[token_type]}"
+
+    if ctx.token_style == "curly":
+        return f"{{{{{token_text}}}}}"  # → {{Code 1}}
+    else:
+        return f"[{token_text}]"  # → [Code 1]
+
+
 def _render(ast: list[dict[str, Any]], ctx: TemplatifyContext) -> str:
-    renderer = (
-        mistune.renderers.markdown.MarkdownRenderer()
-    )  # TODO: use custom renderer
+    renderer = mistune.renderers.markdown.MarkdownRenderer()
     return renderer(ast, state=mistune.BlockState())

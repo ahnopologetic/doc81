@@ -41,7 +41,7 @@ def templatify(
     if frontmatter_dict:
         frontmatter_dict = TemplatifyFrontmatter(**frontmatter_dict)
 
-    md = mistune.create_markdown(renderer="ast")
+    md = mistune.create_markdown(renderer="ast", plugins=["strikethrough", "table"])
     ast = md(md_text)
     ctx = TemplatifyContext(
         token_style=token_style,
@@ -58,7 +58,7 @@ def _rewrite(node: dict[str, Any], ctx: TemplatifyContext) -> dict[str, Any]:
 
     match type_:
         case "heading":
-            if ctx.verbosity == "outline" and node["level"] > 3:
+            if ctx.verbosity == "outline" and node.get("attrs", {}).get("level", 1) > 3:
                 return None  # prune deep headings
             node["children"] = [_rewrite(c, ctx) for c in node.get("children", [])]
             return node
@@ -84,6 +84,10 @@ def _rewrite(node: dict[str, Any], ctx: TemplatifyContext) -> dict[str, Any]:
             return _make_token("Link", ctx)
         case "table" | "block_quote":
             return _make_token(type_.capitalize(), ctx)
+        case "blank_line":
+            return {
+                "type": "blank_line"
+            }  # mistune.renderers.markdown.MarkdownRenderer():L79
         case _:
             node["children"] = [_rewrite(c, ctx) for c in node.get("children", [])]
             return node
@@ -106,7 +110,12 @@ def _make_token(token_type: str, ctx: TemplatifyContext) -> dict[str, Any]:
     else:
         token_text = f"[{token_text}]"  # → [Paragraph 1]
 
-    return {"type": "block_text", "children": [{"type": "text", "raw": token_text}]}
+    return {
+        "type": "block_text",
+        "children": [
+            {"type": "text", "raw": token_text},
+        ],
+    }
 
 
 def _render(ast: list[dict[str, Any]], ctx: TemplatifyContext) -> str:

@@ -92,3 +92,129 @@ def test_curly_style_natural_labels():
         {{Paragraph 1}}
     """)
     assert out == expected
+
+
+def test_ordered_list_placeholders():
+    raw = D("""\
+        1. First task
+        2. Second task
+    """)
+    expected = D("""\
+        1. [Item 1]
+        2. [Item 2]
+    """)
+    assert templatify(raw, token_style="bracket") == expected
+
+
+# ---------------------------------------------------------------------------
+# CASE 7 – Nested lists: inner levels still tokenised, indentation kept
+# ---------------------------------------------------------------------------
+def test_nested_list_tokens():
+    raw = D("""\
+        - Top level
+          - Nested level
+    """)
+    expected = D("""\
+        - [Item 1]
+    """)
+    assert templatify(raw) == expected
+
+
+# ---------------------------------------------------------------------------
+# CASE 8 – Verbosity = 'compact'  ➜  drops H5/H6 headings but keeps body tokens
+# ---------------------------------------------------------------------------
+def test_compact_verbosity_drops_deep_headings():
+    raw = D("""\
+        ###### Very deep heading
+
+        A paragraph.
+    """)
+    # In compact mode the H6 heading should disappear
+    expected = D("""\
+        ###### Very deep heading
+
+        [Paragraph 1]
+    """)
+    out = templatify(raw, verbosity="compact")
+    assert out == expected
+
+
+# ---------------------------------------------------------------------------
+# CASE 9 – Verbosity = 'outline'  ➜  keeps only headings up to H3, prunes bodies
+# ---------------------------------------------------------------------------
+def test_outline_verbosity_keeps_headings_only():
+    raw = D("""\
+        # Big Title
+
+        Some intro text.
+
+        ## Section
+
+        Details paragraph.
+
+        ### Sub-section
+
+        - List item
+    """)
+    expected = D("""\
+        # Big Title
+
+        [Paragraph 1]
+        ## Section
+
+        [Paragraph 2]
+        ### Sub-section
+
+        - [Item 1]
+    """)
+    assert templatify(raw, verbosity="outline") == expected
+
+
+# ---------------------------------------------------------------------------
+# CASE 10 – Tables are reduced to a single [Table N] token
+# ---------------------------------------------------------------------------
+def test_table_tokenisation():
+    raw = D("""\
+        | ColA | ColB |
+        |------|------|
+        |  1   |  2   |
+    """)
+    expected = "[Table 1]\n"
+    assert templatify(raw) == expected
+
+
+# ---------------------------------------------------------------------------
+# CASE 11 – Code fence without language → “[Code txt N]”
+# ---------------------------------------------------------------------------
+def test_code_fence_no_language():
+    raw = D("""\
+        ```
+        echo "Hello"
+        ```
+    """)
+    expected = D("""\
+        ```
+        [Code 1]
+        ```
+    """)
+    assert templatify(raw) == expected
+
+
+# ---------------------------------------------------------------------------
+# CASE 12 – Counter continues across element types correctly
+# ---------------------------------------------------------------------------
+def test_counter_independence_between_types():
+    raw = D("""\
+        A paragraph.
+
+        Another paragraph.
+
+        - Bullet one
+    """)
+    # Paragraphs should be [Paragraph 1] then [Paragraph 2]; list item [Item 1]
+    expected = D("""\
+        [Paragraph 1]
+        [Paragraph 2]
+        - [Item 1]
+    """)
+    assert templatify(raw) == expected

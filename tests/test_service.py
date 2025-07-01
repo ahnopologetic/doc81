@@ -37,9 +37,13 @@ def test_get_template_from_path_raise_error_if_name_is_not_in_frontmatter():
         DOC81_MODE="local",
         DOC81_PROMPT_DIR=str(Path(__file__).parent / "data"),
     ):
+        config = LocalConfig()
         with pytest.raises(Doc81ServiceException) as e:
             get_template(
-                str(Path(__file__).parent / "data" / "fail" / "runbook.non-template.md")
+                str(
+                    Path(__file__).parent / "data" / "fail" / "runbook.non-template.md"
+                ),
+                config,
             )
 
         assert "Template name is required" in str(e.value)
@@ -50,9 +54,13 @@ def test_get_template_from_path_raise_error_if_description_are_not_in_frontmatte
         DOC81_MODE="local",
         DOC81_PROMPT_DIR=str(Path(__file__).parent / "data"),
     ):
+        config = LocalConfig()
         with pytest.raises(Doc81ServiceException) as e:
             get_template(
-                str(Path(__file__).parent / "data" / "fail" / "runbook.non-template.md")
+                str(
+                    Path(__file__).parent / "data" / "fail" / "runbook.non-template.md"
+                ),
+                config,
             )
 
         assert "Template description is required" in str(e.value)

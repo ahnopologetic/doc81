@@ -1,8 +1,8 @@
 from typing import Any, Literal, Optional
+
 import mistune
 import mistune.renderers
 import mistune.renderers.markdown
-import os
 from pydantic import BaseModel
 
 
@@ -170,9 +170,9 @@ def _make_token(token_type: str, ctx: TemplatifyContext) -> dict[str, Any]:
     token_text = f"{token_type} {ctx.counters[token_type]}"
 
     if ctx.token_style == "curly":
-        token_text = f"{{{{{token_text}}}}}"  # → {{Paragraph 1}}
+        token_text = f"{{{{{token_text}}}}}"
     else:
-        token_text = f"[{token_text}]"  # → [Paragraph 1]
+        token_text = f"[{token_text}]"
 
     return {
         "type": "block_text",

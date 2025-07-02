@@ -1,39 +1,66 @@
 # Doc81 🚀
 
-Doc81 is a template management system that helps you create, manage, and use document templates with frontmatter metadata. It provides both a local mode for working with templates on your filesystem and a server mode (coming soon) for accessing templates over HTTP.
+Doc81 is a developer document template platform that helps you create, manage, and use document templates proven by many experts. It provides both a local mode for working with templates on your filesystem and a server mode for accessing templates out there.
 
 ## Features
 
-- Template management with frontmatter metadata (name, description, tags)
-- Local filesystem template storage and retrieval
+- Your Document -> Scalable Document Template in 2s
+- Find appropriate document templates on demand
 - MCP (Model Control Protocol) integration for AI assistant compatibility
-- Simple API for listing and retrieving templates
-- Support for markdown templates
+- API server for general usage
 
 ## Installation
 
 ### Prerequisites
 
-- Python 3.8+
+- Python 3.10+
 - pip or pipenv
 
 ### Quick Start
 
-1. Clone the repository
-```bash
-git clone https://github.com/yourusername/doc-81.git
-cd doc-81
+#### MCP (recommended)
+##### Cursor (default)
+1. setup MCP
+
+```
+> uvx --with doc81 doc81-mcp-cli setup
 ```
 
-2. Install dependencies
-```bash
-pip install -e .
-pip install doc81
+This command add .cursor/rules/doc81.mdc.
+This prompt will guide cursor how to ask and do the work for you.
+
+2. add MCP
+```json
+// mcp.json`
+{
+    "mcpServers": {
+        "doc81": {
+            "command": "uvx",
+            "args": [
+                "--from",
+                "doc81",
+                "doc81-mcp"
+            ],
+            "env": {
+                "DOC81_PROMPT_DIR": "<your local prompt directory>"
+            }
+        },
+    }
+}
 ```
 
-3. Run the MCP server
-```bash
-uvx doc81-mcp
+See [Configuration](#configuration) for details.
+
+3. Use the cursorrule to generate document based on the template.
+
+```
+// cursor ask/agent
+> Help me write a runbook in @your-new-doc.md
+
+cursor: List template (function call)
+cursor: Get template (function call)
+
+Let me copy the runbook template to your-new-doc.md. ...
 ```
 
 ## Usage

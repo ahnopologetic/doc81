@@ -80,25 +80,6 @@ tags: [tag1, tag2]
 Content goes here...
 ```
 
-### Using Templates
-
-Doc81 provides two main functions:
-
-1. `list_templates()` - Lists all available templates
-2. `get_template(path_or_ref)` - Gets a specific template by path or reference
-
-#### Python API
-
-```python
-from doc81 import service
-
-# List all templates
-templates = service.list_templates()
-
-# Get a specific template
-template = service.get_template("path/to/template.md")
-```
-
 #### MCP API
 
 Doc81 integrates with MCP for AI assistant compatibility:
@@ -119,13 +100,13 @@ Doc81 can be configured using environment variables:
 ### Testing
 
 ```bash
-pytest tests/
+uv run python -m pytest tests/
 ```
 
 ## License
 
-[Your license information]
+[License - MIT](./LICENSE)
 
-## Contributing
+<!-- ## Contributing
 
-[Your contribution guidelines]
+[Your contribution guidelines] -->

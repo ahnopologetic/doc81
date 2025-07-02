@@ -381,3 +381,13 @@ class TestTemplateGenerationEndpoints:
             error = response.json()
             assert "error" in error
             assert "Generation failed" in error["error"]
+
+
+class TestHealthEndpoints:
+    """Tests for health endpoints"""
+
+    def test_health(self):
+        """Test GET /health endpoint"""
+        response = client.get("/health")
+        assert response.status_code == 200
+        assert response.json() == {"status": "ok"}

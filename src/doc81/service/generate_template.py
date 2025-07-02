@@ -7,8 +7,8 @@ PROMPT = pathlib.Path(__file__).parent / "prompts" / "doc81-generate.md"
 SUPPORTED_MODELS = Literal[
     "openai/gpt-4o-mini",
     "openai/gpt-4o",
-    "openai/gpt-4.5",
-    "openai/gpt-4.5-mini",
+    "openai/gpt-4.1",
+    "openai/gpt-4.1-mini",
     "anthropic/claude-3.5-sonnet",
     "anthropic/claude-3.5-haiku",
     "anthropic/claude-3.7-sonnet",

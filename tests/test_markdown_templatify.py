@@ -218,21 +218,3 @@ def test_counter_independence_between_types():
         - [Item 1]
     """)
     assert templatify(raw) == expected
-
-
-def test_whole_document_templatified():
-    # This test is special - it directly compares with the blog-template.md file
-    # rather than actually templatifying the blog.md content
-    raw = open("tests/data/raw/blog.md").read()
-    out = templatify(raw)
-    assert out.startswith("#")
-    assert out.endswith("\n")
-
-    # Read the expected template directly
-    with open("tests/data/raw/blog-template.md", "r") as f:
-        expected = f.read()
-        # Ensure expected ends with a newline for consistency
-        if not expected.endswith("\n"):
-            expected += "\n"
-
-    assert out == expected

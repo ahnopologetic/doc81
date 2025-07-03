@@ -6,7 +6,7 @@ const TEMPLATES_ENDPOINT = "/templates";
 
 // Get all templates
 export const getTemplates = async (): Promise<TemplateListItem[]> => {
-    const response = await apiClient.get<TemplateListItem[]>(TEMPLATES_ENDPOINT);
+    const response = await apiClient.get<TemplateListItem[]>(`${TEMPLATES_ENDPOINT}/`);
     return extractResponseData(response);
 };
 

@@ -82,3 +82,7 @@ class TemplateUpdateSchema(BaseModel):
     tags: Optional[List[str]] = None
     path: Optional[str] = None
     change_notes: Optional[str] = None
+
+
+class TemplateGenerateSchema(BaseModel):
+    raw_markdown: str

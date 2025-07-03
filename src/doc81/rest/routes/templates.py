@@ -6,7 +6,13 @@ from sqlalchemy.orm import Session
 
 from doc81.core.database import get_db
 from doc81.core.models import Template, TemplateVersion, TemplateLike, UserProfile
-from doc81.core.schema import TemplateCreateSchema, TemplateSchema, TemplateUpdateSchema
+from doc81.core.schema import (
+    TemplateCreateSchema,
+    TemplateGenerateSchema,
+    TemplateSchema,
+    TemplateUpdateSchema,
+)
+import doc81.service
 
 router = APIRouter(prefix="/templates", tags=["templates"])
 
@@ -38,6 +44,15 @@ async def create_template(
     db.refresh(template)
 
     return template
+
+
+@router.post("/generate")
+async def generate_template(
+    template_data: TemplateGenerateSchema,
+    db: Session = Depends(get_db),
+):
+    """Generate a template with variables"""
+    return doc81.service.generate_template(template_data.raw_markdown)
 
 
 @router.get("/{template_id}", response_model=TemplateSchema)
@@ -111,9 +126,7 @@ async def delete_template(template_id: uuid.UUID, db: Session = Depends(get_db))
 
 @router.post("/{template_id}/like", response_model=TemplateSchema)
 async def like_template(
-    template_id: uuid.UUID, 
-    user_id: uuid.UUID, 
-    db: Session = Depends(get_db)
+    template_id: uuid.UUID, user_id: uuid.UUID, db: Session = Depends(get_db)
 ):
     """Like a template"""
     # Check if template exists
@@ -121,50 +134,47 @@ async def like_template(
     if not template:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail={"error": "Template not found"}
+            detail={"error": "Template not found"},
         )
-    
+
     # Check if user exists
     user = db.query(UserProfile).filter(UserProfile.auth_user_id == user_id).first()
     if not user:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail={"error": "User not found"}
+            status_code=status.HTTP_404_NOT_FOUND, detail={"error": "User not found"}
         )
-    
+
     # Check if user already liked this template
-    existing_like = db.query(TemplateLike).filter(
-        TemplateLike.template_id == template_id,
-        TemplateLike.user_id == user_id
-    ).first()
-    
+    existing_like = (
+        db.query(TemplateLike)
+        .filter(
+            TemplateLike.template_id == template_id, TemplateLike.user_id == user_id
+        )
+        .first()
+    )
+
     if existing_like:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail={"error": "User already liked this template"}
+            detail={"error": "User already liked this template"},
         )
-    
+
     # Create like
-    like = TemplateLike(
-        template_id=template_id,
-        user_id=user_id
-    )
-    
+    like = TemplateLike(template_id=template_id, user_id=user_id)
+
     # Increment like count
     template.like_count += 1
-    
+
     db.add(like)
     db.commit()
     db.refresh(template)
-    
+
     return template
 
 
 @router.delete("/{template_id}/like", response_model=TemplateSchema)
 async def unlike_template(
-    template_id: uuid.UUID, 
-    user_id: uuid.UUID, 
-    db: Session = Depends(get_db)
+    template_id: uuid.UUID, user_id: uuid.UUID, db: Session = Depends(get_db)
 ):
     """Unlike a template"""
     # Check if template exists
@@ -172,27 +182,30 @@ async def unlike_template(
     if not template:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail={"error": "Template not found"}
+            detail={"error": "Template not found"},
         )
-    
+
     # Check if like exists
-    like = db.query(TemplateLike).filter(
-        TemplateLike.template_id == template_id,
-        TemplateLike.user_id == user_id
-    ).first()
-    
+    like = (
+        db.query(TemplateLike)
+        .filter(
+            TemplateLike.template_id == template_id, TemplateLike.user_id == user_id
+        )
+        .first()
+    )
+
     if not like:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail={"error": "User has not liked this template"}
+            detail={"error": "User has not liked this template"},
         )
-    
+
     # Decrement like count and ensure it doesn't go below 0
     if template.like_count > 0:
         template.like_count -= 1
-    
+
     db.delete(like)
     db.commit()
     db.refresh(template)
-    
+
     return template

@@ -1,11 +1,17 @@
 import pytest
 from fastapi.testclient import TestClient
 
+from doc81.core.config import ServerConfig
 from doc81.core.schema import Doc81Template
-from doc81.rest.app import app
+from doc81.rest.app import create_app
+
 
 # TODO: replace with a test config
-client = TestClient(app)
+@pytest.fixture
+def client() -> TestClient:
+    config = ServerConfig(mode="test", database_url="sqlite:///./test.db")
+
+    return TestClient(create_app(config))
 
 
 @pytest.fixture
@@ -39,13 +45,13 @@ def mock_templates():
 class TestTemplatesEndpoints:
     """Tests for template management endpoints"""
 
-    def test_list_templates(self):
+    def test_list_templates(self, client):
         """Test GET /templates endpoint"""
         response = client.get("/templates")
 
         assert response.status_code == 200
 
-    def test_list_templates_empty(self):
+    def test_list_templates_empty(self, client):
         """Test GET /templates when no templates exist"""
         # Execute request
         response = client.get("/templates")
@@ -55,7 +61,7 @@ class TestTemplatesEndpoints:
         templates = response.json()
         assert len(templates) == 0
 
-    def test_create_template(self):
+    def test_create_template(self, client: TestClient):
         """Test POST /templates endpoint"""
         template_data = {
             "name": "New Template",
@@ -71,7 +77,7 @@ class TestTemplatesEndpoints:
         assert created_template["name"] == "New Template"
         assert created_template["description"] == "A new template"
 
-    def test_create_template_invalid_data(self):
+    def test_create_template_invalid_data(self, client: TestClient):
         """Test POST /templates with invalid data"""
         template_data = {"name": "Invalid Template"}
 
@@ -81,7 +87,7 @@ class TestTemplatesEndpoints:
         error = response.json()
         assert "detail" in error
 
-    def test_update_template(self):
+    def test_update_template(self, client: TestClient):
         """Test PATCH /templates/{template_id} endpoint"""
         template_id = "template-123"
         update_data = {
@@ -98,7 +104,7 @@ class TestTemplatesEndpoints:
         assert template["name"] == "Updated Template"
         assert template["description"] == "Updated description"
 
-    def test_update_template_not_found(self):
+    def test_update_template_not_found(self, client: TestClient):
         """Test PATCH /templates/{template_id} with non-existent template"""
         template_id = "non-existent"
         update_data = {"name": "Updated Template"}
@@ -110,7 +116,7 @@ class TestTemplatesEndpoints:
         assert "error" in error
         assert "Template not found" in error["error"]
 
-    def test_delete_template(self):
+    def test_delete_template(self, client: TestClient):
         """Test DELETE /templates endpoint"""
         template_id = "template-to-delete"
 
@@ -119,7 +125,7 @@ class TestTemplatesEndpoints:
         # Verify
         assert response.status_code == 204
 
-    def test_delete_template_not_found(self):
+    def test_delete_template_not_found(self, client: TestClient):
         """Test DELETE /templates with non-existent template"""
         template_id = "non-existent"
 
@@ -134,7 +140,7 @@ class TestTemplatesEndpoints:
 class TestUserTemplatesEndpoints:
     """Tests for user-specific template endpoints"""
 
-    def test_get_user_templates(self):
+    def test_get_user_templates(self, client: TestClient):
         """Test GET /users/{user_id}/templates endpoint"""
         user_id = "user-123"
 
@@ -146,7 +152,7 @@ class TestUserTemplatesEndpoints:
         assert templates[0]["name"] == "Template 1"
         assert templates[1]["name"] == "Template 2"
 
-    def test_get_user_templates_empty(self):
+    def test_get_user_templates_empty(self, client: TestClient):
         """Test GET /users/{user_id}/templates when user has no templates"""
         user_id = "user-with-no-templates"
 
@@ -156,7 +162,7 @@ class TestUserTemplatesEndpoints:
         templates = response.json()
         assert len(templates) == 0
 
-    def test_get_user_templates_user_not_found(self):
+    def test_get_user_templates_user_not_found(self, client: TestClient):
         """Test GET /users/{user_id}/templates with non-existent user"""
         user_id = "non-existent-user"
 
@@ -171,7 +177,7 @@ class TestUserTemplatesEndpoints:
 class TestTemplateDetailsEndpoints:
     """Tests for template details endpoints"""
 
-    def test_get_template(self, mock_template):
+    def test_get_template(self, client: TestClient, mock_template):
         """Test GET /templates/{template_id} endpoint"""
         template_id = "template-123"
 
@@ -183,7 +189,7 @@ class TestTemplateDetailsEndpoints:
         assert template["description"] == "A test template"
         assert "test" in template["tags"]
 
-    def test_get_template_not_found(self):
+    def test_get_template_not_found(self, client: TestClient):
         """Test GET /templates/{template_id} with non-existent template"""
         template_id = "non-existent"
 

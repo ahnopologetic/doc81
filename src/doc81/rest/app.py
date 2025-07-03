@@ -6,8 +6,8 @@ from doc81.core.database import init_db
 from doc81.rest.routes import health, users, templates, companies
 
 
-def create_app() -> FastAPI:
-    config = ServerConfig(mode="server")
+def create_app(config: ServerConfig | None = None) -> FastAPI:
+    config = config or ServerConfig(mode="server")
 
     @asynccontextmanager
     async def lifespan(app: FastAPI):

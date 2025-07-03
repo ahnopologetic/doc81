@@ -6,8 +6,10 @@ import { useState, useCallback } from "react"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent } from "@/components/ui/card"
-import { Upload, FileText, Sparkles, Edit3, Zap, Users } from "lucide-react"
+import { Upload, FileText, Sparkles } from "lucide-react"
 import { MarkdownCanvas } from "@/components/markdown-canvas"
+import { TemplateCarousel } from "@/components/template-carousel"
+import { Header } from "@/components/header"
 
 export default function LandingPage() {
   const [markdownContent, setMarkdownContent] = useState("")
@@ -64,57 +66,19 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 to-red-50">
       {/* Header */}
-      <header className="border-b bg-white/80 backdrop-blur-sm">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-[#d97757] rounded-lg flex items-center justify-center">
-              <Edit3 className="w-5 h-5 text-white" />
-            </div>
-            <span className="text-xl font-bold text-gray-900">MarkdownAI</span>
-          </div>
-          <nav className="hidden md:flex items-center space-x-6">
-            <a href="#features" className="text-gray-600 hover:text-[#d97757] transition-colors">
-              Features
-            </a>
-            <a href="#pricing" className="text-gray-600 hover:text-[#d97757] transition-colors">
-              Pricing
-            </a>
-            <Button
-              variant="outline"
-              className="border-[#d97757] text-[#d97757] hover:bg-[#d97757] hover:text-white bg-transparent"
-            >
-              Sign In
-            </Button>
-          </nav>
-        </div>
-      </header>
+      <Header />
 
       {/* Hero Section */}
-      <section className="container mx-auto px-4 py-16 text-center">
-        <div className="max-w-4xl mx-auto">
-          <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
-            Transform Your <span className="text-[#d97757]">Markdown</span> with AI
-          </h1>
-          <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-            Upload or paste your markdown content and watch it come to life with our AI-powered editor. Edit, enhance,
-            and perfect your content with intelligent suggestions.
+      <section className="container mx-auto px-4 py-16">
+        <div className="text-center mb-12">
+          <h2 className="text-3xl font-bold text-gray-900 mb-4">Discover Ready-to-Use Templates</h2>
+          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+            Browse our collection of professional templates for various documentation needs
           </p>
-
-          {/* Stats */}
-          <div className="flex justify-center items-center space-x-8 mb-12 text-sm text-gray-500">
-            <div className="flex items-center space-x-2">
-              <Users className="w-4 h-4" />
-              <span>10K+ Users</span>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Zap className="w-4 h-4" />
-              <span>Lightning Fast</span>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Sparkles className="w-4 h-4" />
-              <span>AI Powered</span>
-            </div>
-          </div>
+        </div>
+        
+        <div className="max-w-5xl mx-auto">
+          <TemplateCarousel />
         </div>
       </section>
 
@@ -197,48 +161,6 @@ Start typing your markdown content here...
               </div>
             </CardContent>
           </Card>
-        </div>
-      </section>
-
-      {/* Features Section */}
-      <section id="features" className="bg-white py-16">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Powerful Features for Modern Writers</h2>
-            <p className="text-gray-600 max-w-2xl mx-auto">
-              Everything you need to create, edit, and perfect your markdown content with the power of AI
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-            <div className="text-center p-6">
-              <div className="w-16 h-16 bg-[#d97757] rounded-full flex items-center justify-center mx-auto mb-4">
-                <Sparkles className="w-8 h-8 text-white" />
-              </div>
-              <h3 className="text-xl font-semibold mb-2">AI-Powered Editing</h3>
-              <p className="text-gray-600">
-                Get intelligent suggestions and improvements for your content with advanced AI assistance
-              </p>
-            </div>
-
-            <div className="text-center p-6">
-              <div className="w-16 h-16 bg-[#d97757] rounded-full flex items-center justify-center mx-auto mb-4">
-                <Edit3 className="w-8 h-8 text-white" />
-              </div>
-              <h3 className="text-xl font-semibold mb-2">Rich Editor</h3>
-              <p className="text-gray-600">
-                Full-featured markdown editor with live preview, syntax highlighting, and more
-              </p>
-            </div>
-
-            <div className="text-center p-6">
-              <div className="w-16 h-16 bg-[#d97757] rounded-full flex items-center justify-center mx-auto mb-4">
-                <Zap className="w-8 h-8 text-white" />
-              </div>
-              <h3 className="text-xl font-semibold mb-2">Lightning Fast</h3>
-              <p className="text-gray-600">Instant processing and real-time collaboration for seamless workflow</p>
-            </div>
-          </div>
         </div>
       </section>
 

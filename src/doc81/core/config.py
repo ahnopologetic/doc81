@@ -20,6 +20,7 @@ class LocalConfig(Config):
 
 class ServerConfig(Config):
     mode: Literal["server"] = "server"
+    database_url: str = Field(..., description="Database URL for server mode")
 
 
 config = (

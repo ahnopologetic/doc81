@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 
 from doc81.core.config import ServerConfig
-from doc81.rest.routes import health
+from doc81.rest.routes import health, users, templates
 
 
 def create_app() -> FastAPI:
@@ -9,6 +9,8 @@ def create_app() -> FastAPI:
     app = FastAPI(title="Doc81 REST API", version="0.1.0", config=config)
 
     app.include_router(health.router)
+    app.include_router(users.router)
+    app.include_router(templates.router)
 
     return app
 

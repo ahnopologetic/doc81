@@ -8,3 +8,7 @@ class Doc81ConfigException(Doc81Exception):
 
 class Doc81ServiceException(Doc81Exception):
     """Exception raised when there is an error in the service."""
+
+
+class Doc81NotAllowedError(Doc81Exception):
+    """Exception raised when an operation is not allowed."""

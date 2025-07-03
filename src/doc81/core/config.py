@@ -16,10 +16,15 @@ class LocalConfig(Config):
     mode: Literal["local"] = "local"
 
     prompt_dir: Path | None = Field(default=None)
+    database_url: str = Field(
+        "DO_NOT_USE_THIS_CONFIG_FOR_LOCAL_MODE",
+        description="Not used for local mode",
+    )
 
 
 class ServerConfig(Config):
     mode: Literal["server"] = "server"
+    database_url: str = Field(..., description="Database URL for server mode")
 
 
 config = (

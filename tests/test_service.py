@@ -3,7 +3,7 @@ from pathlib import Path
 import pytest
 
 from doc81.core.config import LocalConfig, ServerConfig
-from doc81.core.exception import Doc81ServiceException
+from doc81.core.exception import Doc81NotAllowedError, Doc81ServiceException
 from doc81.service.get_template import get_template
 from doc81.service.list_templates import list_templates
 from tests.utils import override_env
@@ -23,7 +23,7 @@ def test_list_templates():
 def test_list_templates_raise_error_in_server_mode():
     with override_env(DOC81_MODE="server"):
         test_config = ServerConfig()
-        with pytest.raises(NotImplementedError):
+        with pytest.raises(Doc81NotAllowedError):
             list_templates(test_config)
 
 

@@ -1,4 +1,5 @@
 from doc81.core.config import Config, config as global_config
+from doc81.core.exception import Doc81NotAllowedError
 
 
 def list_templates(config: Config | None = None) -> list[str]:
@@ -15,6 +16,6 @@ def list_templates(config: Config | None = None) -> list[str]:
         config = global_config
 
     if config.mode == "server":
-        raise NotImplementedError("Server mode is not implemented yet")
+        raise Doc81NotAllowedError("Server mode is not allowed to list templates")
 
     return [str(path) for path in config.prompt_dir.glob("**/*.md")]

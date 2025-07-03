@@ -14,6 +14,7 @@ dependencies = [
     "litellm>=1.73.6",
     "fastapi>=0.115.14",
     "sqlalchemy>=2.0.41",
+    "psycopg2-binary>=2.9.10",
 ]
 classifiers = [
     "Development Status :: 3 - Alpha",

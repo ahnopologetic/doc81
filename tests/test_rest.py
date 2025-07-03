@@ -4,6 +4,7 @@ from fastapi.testclient import TestClient
 from doc81.core.schema import Doc81Template
 from doc81.rest.app import app
 
+# TODO: replace with a test config
 client = TestClient(app)
 
 

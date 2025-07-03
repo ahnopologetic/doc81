@@ -15,13 +15,12 @@ router = APIRouter(prefix="/users", tags=["users"])
 async def get_user(user_id: uuid.UUID, db: Session = Depends(get_db)):
     """Get user profile by ID"""
     user = db.query(UserProfile).filter(UserProfile.auth_user_id == user_id).first()
-    
+
     if not user:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail={"error": "User not found"}
+            status_code=status.HTTP_404_NOT_FOUND, detail={"error": "User not found"}
         )
-    
+
     return user
 
 
@@ -30,14 +29,13 @@ async def get_user_templates(user_id: uuid.UUID, db: Session = Depends(get_db)):
     """Get templates created by a specific user"""
     # First check if user exists
     user = db.query(UserProfile).filter(UserProfile.auth_user_id == user_id).first()
-    
+
     if not user:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail={"error": "User not found"}
+            status_code=status.HTTP_404_NOT_FOUND, detail={"error": "User not found"}
         )
-    
+
     # Get templates created by the user
     templates = db.query(Template).filter(Template.creator_id == user_id).all()
-    
+
     return templates

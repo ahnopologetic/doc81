@@ -45,12 +45,5 @@ def init_db():
     Initialize database by creating all tables.
     """
     # Import all models to ensure they are registered with Base
-    from doc81.core.models import (
-        Company,
-        UserProfile,
-        Template,
-        TemplateVersion,
-        TemplateLike,
-    )
 
     Base.metadata.create_all(bind=engine)

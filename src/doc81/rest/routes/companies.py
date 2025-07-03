@@ -25,11 +25,11 @@ async def create_company(company_data: CompanySchema, db: Session = Depends(get_
         id=uuid.uuid4(),
         name=company_data.name,
     )
-    
+
     db.add(company)
     db.commit()
     db.refresh(company)
-    
+
     return company
 
 
@@ -37,13 +37,12 @@ async def create_company(company_data: CompanySchema, db: Session = Depends(get_
 async def get_company(company_id: uuid.UUID, db: Session = Depends(get_db)):
     """Get a company by ID"""
     company = db.query(Company).filter(Company.id == company_id).first()
-    
+
     if not company:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail={"error": "Company not found"}
+            status_code=status.HTTP_404_NOT_FOUND, detail={"error": "Company not found"}
         )
-    
+
     return company
 
 
@@ -52,15 +51,14 @@ async def get_company_templates(company_id: uuid.UUID, db: Session = Depends(get
     """Get templates owned by a specific company"""
     # Check if company exists
     company = db.query(Company).filter(Company.id == company_id).first()
-    
+
     if not company:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail={"error": "Company not found"}
+            status_code=status.HTTP_404_NOT_FOUND, detail={"error": "Company not found"}
         )
-    
+
     templates = db.query(Template).filter(Template.company_id == company_id).all()
-    
+
     return templates
 
 
@@ -69,13 +67,12 @@ async def get_company_users(company_id: uuid.UUID, db: Session = Depends(get_db)
     """Get users belonging to a specific company"""
     # Check if company exists
     company = db.query(Company).filter(Company.id == company_id).first()
-    
+
     if not company:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail={"error": "Company not found"}
+            status_code=status.HTTP_404_NOT_FOUND, detail={"error": "Company not found"}
         )
-    
+
     users = db.query(UserProfile).filter(UserProfile.company_id == company_id).all()
-    
-    return users 
+
+    return users

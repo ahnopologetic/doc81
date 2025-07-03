@@ -8,6 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { X, Download, Copy, Wand2, Eye, Edit, Save } from "lucide-react"
 import ReactMarkdown from "react-markdown"
 import { toast } from "sonner"
+import { useGenerateTemplate } from "@/hooks/use-templates"
 
 interface MarkdownCanvasProps {
     isOpen: boolean
@@ -19,6 +20,7 @@ interface MarkdownCanvasProps {
 export function MarkdownCanvas({ isOpen, onClose, initialContent, onContentChange }: MarkdownCanvasProps) {
     const [content, setContent] = useState(initialContent)
     const [isGenerating, setIsGenerating] = useState(false)
+    const generateTemplateMutation = useGenerateTemplate()
 
     useEffect(() => {
         setContent(initialContent)
@@ -31,13 +33,14 @@ export function MarkdownCanvas({ isOpen, onClose, initialContent, onContentChang
 
     const handleAIEnhance = async () => {
         setIsGenerating(true)
-        // Simulate AI processing
-        await new Promise((resolve) => setTimeout(resolve, 2000))
+
+        const result = await generateTemplateMutation.mutateAsync({
+            raw_markdown: content,
+        })
+        console.log(result)
 
         // Add some AI enhancements to the content
-        const enhancedContent =
-            content +
-            "\n\n## AI Suggestions\n\n- Consider adding more detailed examples\n- Break down complex concepts into smaller sections\n- Add relevant links and references\n\n*Enhanced by AI*"
+        const enhancedContent = result
 
         handleContentChange(enhancedContent)
         setIsGenerating(false)

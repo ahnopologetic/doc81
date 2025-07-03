@@ -12,7 +12,7 @@ import {
 export const templateKeys = {
   all: ["templates"] as const,
   lists: () => [...templateKeys.all, "list"] as const,
-  list: (filters: any) => [...templateKeys.lists(), { filters }] as const,
+  list: (filters: Record<string, unknown>) => [...templateKeys.lists(), { filters }] as const,
   details: () => [...templateKeys.all, "detail"] as const,
   detail: (id: string) => [...templateKeys.details(), id] as const,
 };
@@ -36,7 +36,7 @@ export const useTemplate = (pathOrRef: string) => {
 
 // Hook for generating a template with variables
 export const useGenerateTemplate = () => {
-  return useMutation({
+  return useMutation<string, Error, GenerateTemplateParams>({
     mutationFn: (params: GenerateTemplateParams) => generateTemplate(params),
   });
 }; 

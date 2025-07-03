@@ -9,7 +9,7 @@ from doc81.rest.app import create_app
 # TODO: replace with a test config
 @pytest.fixture
 def client() -> TestClient:
-    config = ServerConfig(mode="test", database_url="sqlite:///./test.db")
+    config = ServerConfig(database_url="sqlite:///./test.db")
 
     return TestClient(create_app(config))
 
@@ -262,7 +262,7 @@ class TestTemplateGenerationEndpoints:
 class TestHealthEndpoints:
     """Tests for health endpoints"""
 
-    def test_health(self):
+    def test_health(self, client: TestClient):
         """Test GET /health endpoint"""
         response = client.get("/health")
         assert response.status_code == 200

@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { useCreateUser, useUpdateUser } from "@/hooks";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
 import { toast } from "sonner";
 
@@ -28,7 +27,7 @@ export function UserForm({ userId, defaultValues, onSuccess }: UserFormProps) {
   // Use the create or update mutation based on whether we have a userId
   const createUser = useCreateUser();
   const updateUser = useUpdateUser(userId || "");
-  
+
   const isUpdating = !!userId;
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -38,22 +37,24 @@ export function UserForm({ userId, defaultValues, onSuccess }: UserFormProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     try {
       if (isUpdating) {
         // For update, we don't need to send the username
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { username, ...updateData } = formData;
         // Only include password if it's not empty
-        if (!updateData.password) {
-          delete updateData.password;
-        }
-        
-        await updateUser.mutateAsync(updateData);
+        const finalUpdateData = {
+          ...updateData,
+          ...(updateData.password ? {} : { password: undefined })
+        };
+
+        await updateUser.mutateAsync(finalUpdateData);
         toast.success("User updated successfully");
       } else {
         await createUser.mutateAsync(formData);
         toast.success("User created successfully");
-        
+
         // Reset form after creation
         setFormData({
           username: "",
@@ -62,7 +63,7 @@ export function UserForm({ userId, defaultValues, onSuccess }: UserFormProps) {
           full_name: "",
         });
       }
-      
+
       // Call onSuccess callback if provided
       if (onSuccess) {
         onSuccess();
@@ -141,8 +142,8 @@ export function UserForm({ userId, defaultValues, onSuccess }: UserFormProps) {
             />
           </div>
 
-          <Button 
-            type="submit" 
+          <Button
+            type="submit"
             disabled={isLoading}
             className="w-full"
           >

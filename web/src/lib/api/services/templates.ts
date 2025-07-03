@@ -1,5 +1,5 @@
 import { apiClient, extractResponseData } from "../client";
-import { ApiResponse, Template, TemplateListItem } from "../types";
+import { Template, TemplateListItem } from "../types";
 
 // Templates API endpoints
 const TEMPLATES_ENDPOINT = "/templates";

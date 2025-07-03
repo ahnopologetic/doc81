@@ -4,6 +4,7 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 import { apiClient } from "@/lib/api/client";
 import { PaginatedResponse } from "@/lib/api/types";
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 interface UseInfiniteQueryParams<T> {
   endpoint: string;
   queryKey: unknown[];

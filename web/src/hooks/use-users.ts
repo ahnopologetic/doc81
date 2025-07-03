@@ -15,7 +15,7 @@ import {
 export const userKeys = {
   all: ["users"] as const,
   lists: () => [...userKeys.all, "list"] as const,
-  list: (filters: any) => [...userKeys.lists(), { filters }] as const,
+  list: (filters: Record<string, unknown>) => [...userKeys.lists(), { filters }] as const,
   details: () => [...userKeys.all, "detail"] as const,
   detail: (id: string) => [...userKeys.details(), id] as const,
 };
@@ -55,6 +55,7 @@ export const useUpdateUser = (id: string) => {
   
   return useMutation({
     mutationFn: (params: UpdateUserParams) => updateUser(id, params),
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: userKeys.detail(id) });
       queryClient.invalidateQueries({ queryKey: userKeys.lists() });

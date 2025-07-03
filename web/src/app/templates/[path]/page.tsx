@@ -8,12 +8,14 @@ import { ArrowLeft, Download, Copy, FileText } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
 import { Header } from "@/components/header";
+import { useParams } from "next/navigation";
 
-export default function TemplateDetailPage({ params }: { params: { path: string } }) {
-  const decodedPath = decodeURIComponent(params.path);
+export default function TemplateDetailPage() {
+  const params = useParams();
+  const decodedPath = decodeURIComponent(params.path as string);
   const { data: template, isLoading, error } = useTemplate(decodedPath);
   const generateTemplateMutation = useGenerateTemplate();
-  
+
   const [variables, setVariables] = useState<Record<string, string>>({});
   const [generatedContent, setGeneratedContent] = useState<string | null>(null);
 
@@ -23,12 +25,12 @@ export default function TemplateDetailPage({ params }: { params: { path: string 
       // Simple regex to find variables like {{variable_name}}
       const variableMatches = template.content.match(/\{\{([^}]+)\}\}/g) || [];
       const uniqueVariables: Record<string, string> = {};
-      
+
       variableMatches.forEach(match => {
         const varName = match.replace(/\{\{|\}\}/g, '').trim();
         uniqueVariables[varName] = '';
       });
-      
+
       setVariables(uniqueVariables);
     }
   }, [template?.content]);
@@ -43,10 +45,9 @@ export default function TemplateDetailPage({ params }: { params: { path: string 
   const handleGenerateTemplate = async () => {
     try {
       const content = await generateTemplateMutation.mutateAsync({
-        template_path: decodedPath,
-        variables
+        raw_markdown: template?.content || "",
       });
-      
+
       setGeneratedContent(content);
       toast.success("Template generated successfully");
     } catch (error) {
@@ -95,7 +96,7 @@ export default function TemplateDetailPage({ params }: { params: { path: string 
         <div className="py-10">
           <div className="container mx-auto px-4 text-center">
             <h1 className="text-2xl font-bold text-red-500 mb-4">Template not found</h1>
-            <p className="mb-6">The template you're looking for doesn't exist or couldn't be loaded.</p>
+            <p className="mb-6">The template you&apos;re looking for doesn&apos;t exist or couldn&apos;t be loaded.</p>
             <Link href="/templates">
               <Button>Back to Templates</Button>
             </Link>
@@ -108,7 +109,7 @@ export default function TemplateDetailPage({ params }: { params: { path: string 
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 to-red-50">
       <Header />
-      
+
       <div className="py-10">
         <div className="container mx-auto px-4">
           <div className="max-w-5xl mx-auto">
@@ -148,18 +149,18 @@ export default function TemplateDetailPage({ params }: { params: { path: string 
                         <div className="flex justify-between items-center mb-2">
                           <h2 className="font-medium">Generated Template</h2>
                           <div className="flex gap-2">
-                            <Button 
-                              variant="outline" 
-                              size="sm" 
+                            <Button
+                              variant="outline"
+                              size="sm"
                               onClick={copyToClipboard}
                               className="flex items-center gap-1"
                             >
                               <Copy className="h-3 w-3" />
                               Copy
                             </Button>
-                            <Button 
-                              variant="outline" 
-                              size="sm" 
+                            <Button
+                              variant="outline"
+                              size="sm"
                               onClick={downloadTemplate}
                               className="flex items-center gap-1"
                             >
@@ -183,7 +184,7 @@ export default function TemplateDetailPage({ params }: { params: { path: string 
                 <Card>
                   <CardContent className="p-6">
                     <h2 className="text-xl font-semibold mb-4">Template Variables</h2>
-                    
+
                     {Object.keys(variables).length > 0 ? (
                       <div className="space-y-4">
                         {Object.keys(variables).map(varName => (
@@ -200,9 +201,9 @@ export default function TemplateDetailPage({ params }: { params: { path: string 
                             />
                           </div>
                         ))}
-                        
-                        <Button 
-                          onClick={handleGenerateTemplate} 
+
+                        <Button
+                          onClick={handleGenerateTemplate}
                           className="w-full bg-[#d97757] hover:bg-[#c86a4a] text-white mt-4"
                           disabled={generateTemplateMutation.isPending}
                         >

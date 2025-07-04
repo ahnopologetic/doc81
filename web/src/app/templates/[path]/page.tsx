@@ -7,7 +7,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { ArrowLeft, Download, Copy, FileText, Tag, Building, Clipboard } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
-import { Header } from "@/components/header";
 import { useParams } from "next/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 

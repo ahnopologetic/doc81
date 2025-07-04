@@ -32,6 +32,7 @@ export function Header() {
             <Link href="/" className={`text-sm font-medium ${isActive('/') ? 'text-[#d97757]' : 'text-gray-600 hover:text-gray-900'}`}>
               Home
             </Link>
+            <Link href="/explore" className={`text-sm font-medium ${isActive('/explore') ? 'text-[#d97757]' : 'text-gray-600 hover:text-gray-900'}`}>Explore</Link>
             <Link href="/mcp" className={`text-sm font-medium ${isActive('/mcp') ? 'text-[#d97757]' : 'text-gray-600 hover:text-gray-900'}`}>
               <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-[#d97757] text-white ml-1 mr-1">
                 New

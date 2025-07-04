@@ -4,11 +4,12 @@ import { useEffect, useState } from "react";
 import { useTemplate, useGenerateTemplate } from "@/hooks";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { ArrowLeft, Download, Copy, FileText } from "lucide-react";
+import { ArrowLeft, Download, Copy, FileText, Tag, Building, Clipboard } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
 import { Header } from "@/components/header";
 import { useParams } from "next/navigation";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export default function TemplateDetailPage() {
   const params = useParams();
@@ -16,7 +17,7 @@ export default function TemplateDetailPage() {
   const { data: template, isLoading, error } = useTemplate(decodedPath);
   const generateTemplateMutation = useGenerateTemplate();
 
-  const [variables, setVariables] = useState<Record<string, string>>({});
+  // const [variables, setVariables] = useState<Record<string, string>>({});
   const [generatedContent, setGeneratedContent] = useState<string | null>(null);
 
   // Extract variables from template content when it loads
@@ -31,16 +32,16 @@ export default function TemplateDetailPage() {
         uniqueVariables[varName] = '';
       });
 
-      setVariables(uniqueVariables);
+      // setVariables(uniqueVariables);
     }
   }, [template?.content]);
 
-  const handleVariableChange = (name: string, value: string) => {
-    setVariables(prev => ({
-      ...prev,
-      [name]: value
-    }));
-  };
+  // const handleVariableChange = (name: string, value: string) => {
+  //   setVariables(prev => ({
+  //     ...prev,
+  //     [name]: value
+  //   }));
+  // };
 
   const handleGenerateTemplate = async () => {
     try {
@@ -56,11 +57,9 @@ export default function TemplateDetailPage() {
     }
   };
 
-  const copyToClipboard = () => {
-    if (generatedContent) {
-      navigator.clipboard.writeText(generatedContent);
-      toast.success("Copied to clipboard");
-    }
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text);
+    toast.success("Copied to clipboard");
   };
 
   const downloadTemplate = () => {
@@ -76,6 +75,19 @@ export default function TemplateDetailPage() {
       URL.revokeObjectURL(url);
       toast.success("Download started");
     }
+  };
+
+  // Sample AI prompts based on the template
+  const getAIPrompts = () => {
+    if (!template) return [];
+
+    return [
+      `doc81: Help me create a ${template.name} based on best practices (ref=${template.id})`,
+      `doc81: Generate a detailed ${template.name} for my project about [YOUR_PROJECT] (ref=${template.id})`,
+      `doc81: What should I include in my ${template.name} to ensure completeness? (ref=${template.id})`,
+      `doc81: Write a ${template.name} that focuses on [SPECIFIC_ASPECT] (ref=${template.id})`,
+      `doc81: Adapt this ${template.name} template for a [YOUR_INDUSTRY] context (ref=${template.id})`
+    ];
   };
 
   if (isLoading) {
@@ -152,7 +164,7 @@ export default function TemplateDetailPage() {
                             <Button
                               variant="outline"
                               size="sm"
-                              onClick={copyToClipboard}
+                              onClick={() => copyToClipboard(generatedContent)}
                               className="flex items-center gap-1"
                             >
                               <Copy className="h-3 w-3" />
@@ -180,39 +192,98 @@ export default function TemplateDetailPage() {
                 </Card>
               </div>
 
-              <div>
+              <div className="space-y-6">
                 <Card>
                   <CardContent className="p-6">
-                    <h2 className="text-xl font-semibold mb-4">Template Variables</h2>
+                    <h2 className="text-xl font-semibold mb-4">Template Information</h2>
 
-                    {Object.keys(variables).length > 0 ? (
-                      <div className="space-y-4">
-                        {Object.keys(variables).map(varName => (
-                          <div key={varName} className="space-y-1">
-                            <label className="text-sm font-medium">
-                              {varName}
-                            </label>
-                            <input
-                              type="text"
-                              value={variables[varName]}
-                              onChange={(e) => handleVariableChange(varName, e.target.value)}
-                              className="w-full p-2 border rounded-md"
-                              placeholder={`Enter ${varName}`}
-                            />
-                          </div>
-                        ))}
-
-                        <Button
-                          onClick={handleGenerateTemplate}
-                          className="w-full bg-[#d97757] hover:bg-[#c86a4a] text-white mt-4"
-                          disabled={generateTemplateMutation.isPending}
-                        >
-                          {generateTemplateMutation.isPending ? "Generating..." : "Generate Template"}
-                        </Button>
+                    <div className="space-y-4">
+                      <div className="flex items-center gap-2">
+                        <FileText className="h-4 w-4 text-gray-500" />
+                        <div>
+                          <p className="text-sm text-gray-500">Template Name</p>
+                          <p className="font-medium">{template.name}</p>
+                        </div>
                       </div>
-                    ) : (
-                      <p className="text-gray-500">This template has no variables to customize.</p>
-                    )}
+
+                      {template.description && (
+                        <div className="flex items-start gap-2">
+                          <FileText className="h-4 w-4 text-gray-500 mt-0.5" />
+                          <div>
+                            <p className="text-sm text-gray-500">Description</p>
+                            <p className="font-medium">{template.description}</p>
+                          </div>
+                        </div>
+                      )}
+
+                      <div className="flex items-center gap-2">
+                        <Tag className="h-4 w-4 text-gray-500" />
+                        <div>
+                          <p className="text-sm text-gray-500">Tags</p>
+                          <div className="flex flex-wrap gap-1 mt-1">
+                            {template.tags.filter(tag => !tag.startsWith("company:")).map(tag => (
+                              <span key={tag} className="bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded-full">
+                                {tag}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        <Building className="h-4 w-4 text-gray-500" />
+                        <div>
+                          <p className="text-sm text-gray-500">Used by Companies</p>
+                          <div className="flex flex-wrap gap-1 mt-1">
+                            {template.tags.filter(tag => tag.startsWith("company:")).map(tag => (
+                              <Avatar key={tag} className="w-6 h-6">
+                                <AvatarImage src={`https://logo.clearbit.com/${tag.replace("company:", "").toLowerCase()}`} />
+                                <AvatarFallback>{tag.replace("company:", "").charAt(0)}</AvatarFallback>
+                              </Avatar>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <Button
+                      onClick={handleGenerateTemplate}
+                      className="w-full bg-[#d97757] hover:bg-[#c86a4a] text-white mt-6"
+                      disabled={generateTemplateMutation.isPending}
+                    >
+                      {generateTemplateMutation.isPending ? "Generating..." : "Generate Template"}
+                    </Button>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardContent className="p-6">
+                    <h2 className="text-xl font-semibold mb-4">Start Writing in Cursor</h2>
+                    <p className="text-gray-600 text-sm mb-4">
+                      Copy one of these prompts to get started with AI assistance in Cursor:
+                    </p>
+
+                    <div className="space-y-3">
+                      {(() => {
+                        const prompts = getAIPrompts();
+                        const randomPrompt = prompts[Math.floor(Math.random() * prompts.length)];
+                        return (
+                          <div
+                            className="bg-white border border-gray-200 rounded-md p-3 flex justify-between items-center hover:bg-gray-50 transition-colors"
+                          >
+                            <p className="text-sm code bg-gray-100 p-2 rounded-md">{randomPrompt}</p>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => copyToClipboard(randomPrompt)}
+                              className="h-8 w-8 p-0"
+                            >
+                              <Clipboard className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        );
+                      })()}
+                    </div>
                   </CardContent>
                 </Card>
               </div>

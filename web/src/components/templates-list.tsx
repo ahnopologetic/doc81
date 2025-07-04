@@ -5,9 +5,11 @@ import { useTemplates, useTemplate } from "@/hooks";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Markdown from "react-markdown";
+import { useRouter } from "next/navigation";
 
 export function TemplatesList() {
   const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null);
+  const router = useRouter();
 
   // Query for all templates
   const {
@@ -68,7 +70,7 @@ export function TemplatesList() {
                   </Markdown>
                 </div>
                 <div className="mt-4">
-                  <Button>Use This Template</Button>
+                  <Button onClick={() => router.push(`/templates/${templateDetails.id}`)}>Use This Template</Button>
                 </div>
               </CardContent>
             </Card>

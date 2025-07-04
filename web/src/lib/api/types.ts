@@ -30,6 +30,7 @@ export interface Template {
   created_at: string;
   updated_at: string;
   path: string;
+  tags: string[];
 }
 
 export interface TemplateListItem {

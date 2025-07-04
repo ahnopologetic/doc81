@@ -1,7 +1,9 @@
 from pathlib import Path
-from doc81.core.config import Config, LocalConfig, config as global_config
+
+import requests
+from doc81.core.config import Config, LocalConfig, ServerConfig, config as global_config
 from doc81.core.exception import Doc81ServiceException
-from doc81.core.schema import Doc81Template
+from doc81.core.schema import Doc81Template, TemplateSchema
 import frontmatter
 
 
@@ -21,14 +23,18 @@ def get_template(
     if not config:
         config = global_config
 
-    if path_or_ref.startswith("http"):
+    if config.mode == "server":
         return _get_template_from_url(path_or_ref, config).model_dump()
     else:
         return _get_template_from_path(path_or_ref, config).model_dump()
 
 
-def _get_template_from_url(url: str, config: Config) -> Doc81Template:
-    raise Doc81ServiceException("Not implemented yet")
+def _get_template_from_url(ref: str, config: ServerConfig) -> TemplateSchema:
+    url = f"{config.server_url}/templates/{ref}"
+    response = requests.get(url)
+    response.raise_for_status()
+
+    return TemplateSchema(**response.json())
 
 
 def _get_template_from_path(path: str, config: LocalConfig) -> Doc81Template:

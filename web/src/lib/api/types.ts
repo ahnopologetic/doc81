@@ -37,6 +37,8 @@ export interface TemplateListItem {
   name: string;
   description?: string;
   path: string;
+  content: string;
+  tags: string[];
 }
 
 // User related types

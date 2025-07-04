@@ -25,6 +25,10 @@ class LocalConfig(Config):
 class ServerConfig(Config):
     mode: Literal["server"] = "server"
     database_url: str = Field(..., description="Database URL for server mode")
+    server_url: str = Field(
+        "https://doc81-979490649165.us-east1.run.app",  # TODO: no hardcoded url
+        description="Server URL for server mode",
+    )
 
 
 config = (

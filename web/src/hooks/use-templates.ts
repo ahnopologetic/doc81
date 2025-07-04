@@ -26,11 +26,11 @@ export const useTemplates = () => {
 };
 
 // Hook for fetching a single template
-export const useTemplate = (pathOrRef: string) => {
+export const useTemplate = (id: string) => {
   return useQuery({
-    queryKey: templateKeys.detail(pathOrRef),
-    queryFn: () => getTemplate(pathOrRef),
-    enabled: !!pathOrRef,
+    queryKey: templateKeys.detail(id),
+    queryFn: () => getTemplate(id),
+    enabled: !!id,
   });
 };
 

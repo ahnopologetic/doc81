@@ -77,7 +77,7 @@ export default function LandingPage() {
           </p>
         </div>
         
-        <div className="max-w-5xl mx-auto">
+        <div className="max-w-5xl mx-auto h-full">
           <TemplateCarousel />
         </div>
       </section>

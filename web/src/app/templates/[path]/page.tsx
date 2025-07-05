@@ -9,6 +9,7 @@ import Link from "next/link";
 import { toast } from "sonner";
 import { useParams } from "next/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Header } from "@/components/header";
 
 export default function TemplateDetailPage() {
   const params = useParams();

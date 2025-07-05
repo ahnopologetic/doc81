@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useTemplates } from "@/hooks";
 import useEmblaCarousel from "embla-carousel-react";
-import { ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import Markdown from "react-markdown";
@@ -27,10 +27,33 @@ export function TemplateCarousel() {
         align: "start",
         skipSnaps: false,
         dragFree: true,
+        slidesToScroll: 1,
+        containScroll: "trimSnaps",
     });
 
     const [hoveredTemplate, setHoveredTemplate] = useState<string | null>(null);
     const [autoplayEnabled, setAutoplayEnabled] = useState(true);
+    const [canScrollPrev, setCanScrollPrev] = useState(false);
+    const [canScrollNext, setCanScrollNext] = useState(false);
+
+    // Update scroll buttons state
+    useEffect(() => {
+        if (!emblaApi) return;
+
+        const onSelect = () => {
+            setCanScrollPrev(emblaApi.canScrollPrev());
+            setCanScrollNext(emblaApi.canScrollNext());
+        };
+
+        emblaApi.on("select", onSelect);
+        emblaApi.on("reInit", onSelect);
+        onSelect();
+
+        return () => {
+            emblaApi.off("select", onSelect);
+            emblaApi.off("reInit", onSelect);
+        };
+    }, [emblaApi]);
 
     // Auto-scroll the carousel when not hovering
     useEffect(() => {
@@ -42,6 +65,14 @@ export function TemplateCarousel() {
 
         return () => clearInterval(autoplay);
     }, [emblaApi, autoplayEnabled]);
+
+    const scrollPrev = useCallback(() => {
+        if (emblaApi) emblaApi.scrollPrev();
+    }, [emblaApi]);
+
+    const scrollNext = useCallback(() => {
+        if (emblaApi) emblaApi.scrollNext();
+    }, [emblaApi]);
 
     const truncateContent = useCallback((content: string, isHovered: boolean): string => {
         const maxLength = isHovered ? 300 : 100;
@@ -74,7 +105,30 @@ export function TemplateCarousel() {
 
     return (
         <div className="relative">
-            <div className="overflow-hidden" ref={viewportRef}>
+            {/* Navigation Arrows */}
+            <Button 
+                onClick={scrollPrev}
+                disabled={!canScrollPrev}
+                className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white/80 hover:bg-white text-[#d97757] rounded-full shadow-md p-2 -ml-4"
+                size="icon"
+                variant="ghost"
+                aria-label="Previous slide"
+            >
+                <ChevronLeft className="h-6 w-6" />
+            </Button>
+            
+            <Button 
+                onClick={scrollNext}
+                disabled={!canScrollNext}
+                className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white/80 hover:bg-white text-[#d97757] rounded-full shadow-md p-2 -mr-4"
+                size="icon"
+                variant="ghost"
+                aria-label="Next slide"
+            >
+                <ChevronRight className="h-6 w-6" />
+            </Button>
+
+            <div className="h-full overflow-hidden" ref={viewportRef}>
                 <div className="flex">
                     {templates.map((template) => {
                         const isHovered = hoveredTemplate === template.id;
@@ -82,28 +136,29 @@ export function TemplateCarousel() {
                         return (
                             <div
                                 key={template.id}
-                                className="flex-1 min-w-0 mx-4"
+                                className="flex-[0_0_33.333%] min-w-0 mx-4 md:flex-[0_0_30%] sm:flex-[0_0_80%]"
                                 onMouseEnter={() => handleMouseEnter(template.id)}
                                 onMouseLeave={handleMouseLeave}
                             >
                                 <Card className={`transition-all duration-300 ${isHovered ? 'shadow-lg scale-105 z-10' : ''}`}>
-                                    <CardContent className="h-full flex flex-col items-start max-w-full gap-2">
+                                    <CardContent className="h-[400px] grid grid-cols-1 grid-rows-[auto_1fr_auto_auto] gap-4 p-4">
                                         <div className="flex items-center">
-                                            <h3 className="font-medium text-md">{template.name}</h3>
+                                            <h3 className="font-medium text-lg">{template.name}</h3>
                                         </div>
 
-                                        <div className="flex w-full">
-                                            <div className="flex-grow">
-                                                <p className="text-xs text-gray-500">{template.description}</p>
-                                            </div>
+                                        <div className="relative overflow-hidden">
+                                            <div className="h-full">
+                                                <p className="text-sm text-gray-600 mb-2">{template.description}</p>
 
-                                            {isHovered && (
-                                                <div className="bg-gray-50 rounded p-3 ml-2 w-[1000px] max-h-[300px] overflow-y-auto text-sm">
+                                                <div
+                                                    className={`bg-gray-50 rounded p-4 markdown-content h-full overflow-y-auto transition-opacity duration-300 ${isHovered ? 'opacity-100' : 'opacity-0 absolute top-0 left-0'
+                                                        }`}
+                                                >
                                                     <Markdown>
-                                                        {truncateContent(template.content, true)}
+                                                        {truncateContent(template.content, isHovered)}
                                                     </Markdown>
                                                 </div>
-                                            )}
+                                            </div>
                                         </div>
 
                                         <div className="*:data-[slot=avatar]:ring-background flex -space-x-2 *:data-[slot=avatar]:ring-2">
@@ -117,7 +172,7 @@ export function TemplateCarousel() {
                                             ))}
                                         </div>
 
-                                        <div className="mt-2 flex justify-end w-full">
+                                        <div className="flex justify-end w-full">
                                             <Link href={`/templates/${template.id}`}>
                                                 <Button
                                                     variant="ghost"
@@ -134,6 +189,22 @@ export function TemplateCarousel() {
                         );
                     })}
                 </div>
+            </div>
+
+            {/* Carousel Controls - Dots */}
+            <div className="flex justify-center mt-4 gap-2">
+                {templates.length > 0 && Array.from({ length: Math.min(5, templates.length) }).map((_, index) => (
+                    <button
+                        key={index}
+                        className={`w-2 h-2 rounded-full transition-all ${
+                            emblaApi?.selectedScrollSnap() === index 
+                                ? 'bg-[#d97757] w-4' 
+                                : 'bg-gray-300 hover:bg-gray-400'
+                        }`}
+                        onClick={() => emblaApi?.scrollTo(index)}
+                        aria-label={`Go to slide ${index + 1}`}
+                    />
+                ))}
             </div>
 
             <div className="mt-6 text-center">

@@ -9,6 +9,7 @@ import { X, Download, Copy, Wand2, Eye, Edit, Save } from "lucide-react"
 import ReactMarkdown from "react-markdown"
 import { toast } from "sonner"
 import { useGenerateTemplate } from "@/hooks/use-templates"
+import remarkGfm from "remark-gfm"
 
 interface MarkdownCanvasProps {
     isOpen: boolean
@@ -154,7 +155,7 @@ export function MarkdownCanvas({ isOpen, onClose, initialContent, onContentChang
                                 <Card className="h-full">
                                     <CardContent className="p-6 h-full overflow-auto">
                                         <div className="prose prose-gray max-w-none">
-                                            <ReactMarkdown>{content}</ReactMarkdown>
+                                            <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
                                         </div>
                                     </CardContent>
                                 </Card>

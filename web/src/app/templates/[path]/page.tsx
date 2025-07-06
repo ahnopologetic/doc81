@@ -8,8 +8,11 @@ import { ArrowLeft, Download, Copy, FileText, Tag, Building, Clipboard } from "l
 import Link from "next/link";
 import { toast } from "sonner";
 import { useParams } from "next/navigation";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Header } from "@/components/header";
+import MarkdownCollapsibleTimeline from "@/components/markdown-collapsible-timeline";
+import { AvatarCircles } from "@/components/magicui/avatar-circles";
+import remarkGfm from "remark-gfm";
+import Markdown from "react-markdown";
 
 export default function TemplateDetailPage() {
   const params = useParams();
@@ -143,18 +146,14 @@ export default function TemplateDetailPage() {
                       <h1 className="text-2xl font-bold">{template.name}</h1>
                     </div>
 
-                    {template.description && (
-                      <p className="text-gray-600 mb-6">{template.description}</p>
-                    )}
 
-                    <div className="bg-gray-50 p-4 rounded-md mb-6">
-                      <h2 className="font-medium mb-2">Template Preview</h2>
-                      <div className="prose max-w-none bg-white p-4 rounded border border-gray-200 overflow-auto max-h-[400px]">
-                        <pre className="whitespace-pre-wrap text-sm">
-                          {template.content}
-                        </pre>
-                      </div>
+                    <div className="mb-4">
+                      {template.description && (
+                        <Markdown remarkPlugins={[remarkGfm]}>{template.description}</Markdown>
+                      )}
                     </div>
+
+                    <MarkdownCollapsibleTimeline markdown={template.content} title="Template ToC" className="mb-6" />
 
                     {generatedContent && (
                       <div className="bg-gray-50 p-4 rounded-md mb-6">
@@ -211,7 +210,7 @@ export default function TemplateDetailPage() {
                           <FileText className="h-4 w-4 text-gray-500 mt-0.5" />
                           <div>
                             <p className="text-sm text-gray-500">Description</p>
-                            <p className="font-medium">{template.description}</p>
+                            <Markdown remarkPlugins={[remarkGfm]}>{template.description}</Markdown>
                           </div>
                         </div>
                       )}
@@ -234,14 +233,10 @@ export default function TemplateDetailPage() {
                         <Building className="h-4 w-4 text-gray-500" />
                         <div>
                           <p className="text-sm text-gray-500">Used by Companies</p>
-                          <div className="flex flex-wrap gap-1 mt-1">
-                            {template.tags.filter(tag => tag.startsWith("company:")).map(tag => (
-                              <Avatar key={tag} className="w-6 h-6">
-                                <AvatarImage src={`https://logo.clearbit.com/${tag.replace("company:", "").toLowerCase()}`} />
-                                <AvatarFallback>{tag.replace("company:", "").charAt(0)}</AvatarFallback>
-                              </Avatar>
-                            ))}
-                          </div>
+                          <AvatarCircles numPeople={template.tags.filter(tag => tag.startsWith("company:")).length} avatarUrls={template.tags.filter(tag => tag.startsWith("company:")).map((tag) => ({
+                            imageUrl: `https://img.logo.dev/${tag.replace("company:", "").toLowerCase()}.com?token=pk_cSnAqNxhTVafx_G7shrBBg&size=50&retina=true`,
+                            profileUrl: `https://${tag.replace("company:", "").toLowerCase()}.com`,
+                          }))} />
                         </div>
                       </div>
                     </div>

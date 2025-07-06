@@ -6,6 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Markdown from "react-markdown";
 import { useRouter } from "next/navigation";
+import remarkGfm from "remark-gfm";
 
 export function TemplatesList() {
   const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null);
@@ -62,10 +63,10 @@ export function TemplatesList() {
               <CardContent className="p-4">
                 <h3 className="font-medium">{templateDetails.name}</h3>
                 {templateDetails.description && (
-                  <p className="text-gray-500 mb-4">{templateDetails.description}</p>
+                  <Markdown remarkPlugins={[remarkGfm]}>{templateDetails.description}</Markdown>
                 )}
                 <div className="bg-gray-100 p-4 rounded-md">
-                  <Markdown>
+                  <Markdown remarkPlugins={[remarkGfm]}>
                     {templateDetails.content}
                   </Markdown>
                 </div>

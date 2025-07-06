@@ -8,17 +8,8 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import Markdown from "react-markdown";
-import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
-
-// FAANG + NVIDIA, MICROSOFT
-const COMPANY_LOGOS = {
-    "meta": "/logos/meta.svg",
-    "apple": "/logos/apple.svg",
-    "amazon": "/logos/amazon.svg",
-    "google": "/logos/google.svg",
-    "microsoft": "/logos/microsoft.svg",
-    "nvidia": "/logos/nvidia.svg",
-}
+import { AvatarCircles } from "./magicui/avatar-circles";
+import remarkGfm from "remark-gfm";
 
 export function TemplateCarousel() {
     const { data: templates, isLoading } = useTemplates();
@@ -106,7 +97,7 @@ export function TemplateCarousel() {
     return (
         <div className="relative">
             {/* Navigation Arrows */}
-            <Button 
+            <Button
                 onClick={scrollPrev}
                 disabled={!canScrollPrev}
                 className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white/80 hover:bg-white text-[#d97757] rounded-full shadow-md p-2 -ml-4"
@@ -116,8 +107,8 @@ export function TemplateCarousel() {
             >
                 <ChevronLeft className="h-6 w-6" />
             </Button>
-            
-            <Button 
+
+            <Button
                 onClick={scrollNext}
                 disabled={!canScrollNext}
                 className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white/80 hover:bg-white text-[#d97757] rounded-full shadow-md p-2 -mr-4"
@@ -143,7 +134,7 @@ export function TemplateCarousel() {
                                 <Card className={`transition-all duration-300 ${isHovered ? 'shadow-lg scale-105 z-10' : ''}`}>
                                     <CardContent className="h-[400px] grid grid-cols-1 grid-rows-[auto_1fr_auto_auto] gap-4 p-4">
                                         <div className="flex items-center">
-                                            <h3 className="font-medium text-lg">{template.name}</h3>
+                                            <h3 className="font-bold text-lg">{template.name}</h3>
                                         </div>
 
                                         <div className="relative overflow-hidden">
@@ -151,26 +142,25 @@ export function TemplateCarousel() {
                                                 <p className="text-sm text-gray-600 mb-2">{template.description}</p>
 
                                                 <div
-                                                    className={`bg-gray-50 rounded p-4 markdown-content h-full overflow-y-auto transition-opacity duration-300 ${isHovered ? 'opacity-100' : 'opacity-0 absolute top-0 left-0'
+                                                    className={`bg-gray-50 rounded prose p-4 markdown-content h-full overflow-y-auto transition-opacity duration-300 ${isHovered ? 'opacity-100' : 'opacity-0 absolute top-0 left-0'
                                                         }`}
                                                 >
-                                                    <Markdown>
+                                                    <Markdown remarkPlugins={[remarkGfm]}>
                                                         {truncateContent(template.content, isHovered)}
                                                     </Markdown>
                                                 </div>
                                             </div>
                                         </div>
 
-                                        <div className="*:data-[slot=avatar]:ring-background flex -space-x-2 *:data-[slot=avatar]:ring-2">
-                                            {template.tags.map((tag) => (
-                                                COMPANY_LOGOS[tag.replace("company:", "").toLowerCase() as keyof typeof COMPANY_LOGOS] && (
-                                                    <Avatar key={tag} className="w-8 h-8 border-2 border-gray-200">
-                                                        <AvatarImage src={COMPANY_LOGOS[tag.replace("company:", "").toLowerCase() as keyof typeof COMPANY_LOGOS]} alt={tag} />
-                                                        <AvatarFallback>{tag}</AvatarFallback>
-                                                    </Avatar>
-                                                )
-                                            ))}
-                                        </div>
+                                        {template.tags.filter((tag) => tag.startsWith("company:")).length > 0 && (
+                                            <div className="*:data-[slot=avatar]:ring-background flex -space-x-2 *:data-[slot=avatar]:ring-2 flex-col">
+                                                <p className="text-xs text-gray-600">Used by:</p>
+                                                <AvatarCircles numPeople={template.tags.filter((tag) => tag.startsWith("company:")).length} avatarUrls={template.tags.filter((tag) => tag.startsWith("company:")).map((tag) => ({
+                                                    imageUrl: `https://img.logo.dev/${tag.replace("company:", "").toLowerCase()}.com?token=pk_cSnAqNxhTVafx_G7shrBBg&size=50&retina=true`,
+                                                    profileUrl: `https://${tag.replace("company:", "").toLowerCase()}.com`,
+                                                }))} />
+                                            </div>
+                                        )}
 
                                         <div className="flex justify-end w-full">
                                             <Link href={`/templates/${template.id}`}>
@@ -196,11 +186,10 @@ export function TemplateCarousel() {
                 {templates.length > 0 && Array.from({ length: Math.min(5, templates.length) }).map((_, index) => (
                     <button
                         key={index}
-                        className={`w-2 h-2 rounded-full transition-all ${
-                            emblaApi?.selectedScrollSnap() === index 
-                                ? 'bg-[#d97757] w-4' 
-                                : 'bg-gray-300 hover:bg-gray-400'
-                        }`}
+                        className={`w-2 h-2 rounded-full transition-all ${emblaApi?.selectedScrollSnap() === index
+                            ? 'bg-[#d97757] w-4'
+                            : 'bg-gray-300 hover:bg-gray-400'
+                            }`}
                         onClick={() => emblaApi?.scrollTo(index)}
                         aria-label={`Go to slide ${index + 1}`}
                     />

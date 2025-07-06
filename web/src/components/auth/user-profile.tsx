@@ -15,8 +15,12 @@ export function UserProfile() {
     try {
       await signOut();
       toast.success("Signed out successfully");
-    } catch (error: any) {
-      toast.error(error.message || "Failed to sign out");
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        toast.error(error.message);
+      } else {
+        toast.error("Failed to sign out");
+      }
     } finally {
       setIsLoading(false);
     }

@@ -31,8 +31,12 @@ export function LoginForm() {
       } else {
         toast.success("Signed in successfully");
       }
-    } catch (error: any) {
-      toast.error(error.message || "An unexpected error occurred");
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        toast.error(error.message);
+      } else {
+        toast.error("An unexpected error occurred");
+      }
     } finally {
       setIsLoading(false);
     }
@@ -84,10 +88,10 @@ export function LoginForm() {
           >
             {isLoading ? "Signing in..." : "Sign In"}
           </Button>
-          
+
           <div className="text-center mt-4">
             <p className="text-sm text-gray-600">
-              Don't have an account?{" "}
+              Don&apos;t have an account?{" "}
               <Link href="/auth/signup" className="text-[#d97757] hover:underline">
                 Sign Up
               </Link>

@@ -229,16 +229,18 @@ export default function TemplateDetailPage() {
                         </div>
                       </div>
 
-                      <div className="flex items-center gap-2">
-                        <Building className="h-4 w-4 text-gray-500" />
-                        <div>
-                          <p className="text-sm text-gray-500">Used by Companies</p>
-                          <AvatarCircles numPeople={template.tags.filter(tag => tag.startsWith("company:")).length} avatarUrls={template.tags.filter(tag => tag.startsWith("company:")).map((tag) => ({
-                            imageUrl: `https://img.logo.dev/${tag.replace("company:", "").toLowerCase()}.com?token=pk_cSnAqNxhTVafx_G7shrBBg&size=50&retina=true`,
-                            profileUrl: `https://${tag.replace("company:", "").toLowerCase()}.com`,
-                          }))} />
+                      {template.tags.filter(tag => tag.startsWith("company:")).length > 0 && (
+                        <div className="flex items-center gap-2">
+                          <Building className="h-4 w-4 text-gray-500" />
+                          <div>
+                            <p className="text-sm text-gray-500">Used by Companies</p>
+                            <AvatarCircles numPeople={template.tags.filter(tag => tag.startsWith("company:")).length} avatarUrls={template.tags.filter(tag => tag.startsWith("company:")).map((tag) => ({
+                              imageUrl: `https://img.logo.dev/${tag.replace("company:", "").toLowerCase()}.com?token=${process.env.NEXT_PUBLIC_LOGO_DEV_TOKEN}&size=50&retina=true`,
+                              profileUrl: `https://${tag.replace("company:", "").toLowerCase()}.com`,
+                            }))} />
+                          </div>
                         </div>
-                      </div>
+                      )}
                     </div>
 
                     <Button

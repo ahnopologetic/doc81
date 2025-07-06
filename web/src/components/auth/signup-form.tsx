@@ -23,24 +23,28 @@ export function SignupForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (formData.password !== formData.confirmPassword) {
       toast.error("Passwords do not match");
       return;
     }
-    
+
     setIsLoading(true);
 
     try {
       const { error } = await signUp(formData.email, formData.password);
-      
+
       if (error) {
         toast.error(error.message || "Failed to sign up");
       } else {
         toast.success("Check your email to confirm your account");
       }
-    } catch (error: any) {
-      toast.error(error.message || "An unexpected error occurred");
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        toast.error(error.message);
+      } else {
+        toast.error("An unexpected error occurred");
+      }
     } finally {
       setIsLoading(false);
     }
@@ -110,7 +114,7 @@ export function SignupForm() {
           >
             {isLoading ? "Signing up..." : "Sign Up"}
           </Button>
-          
+
           <div className="text-center mt-4">
             <p className="text-sm text-gray-600">
               Already have an account?{" "}

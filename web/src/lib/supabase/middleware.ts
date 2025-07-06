@@ -1,5 +1,6 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextRequest, NextResponse } from 'next/server'
+import { CookieOptions } from '@supabase/ssr'
 
 export async function updateSession(request: NextRequest) {
   // Create an unmodified response
@@ -17,7 +18,7 @@ export async function updateSession(request: NextRequest) {
         get(name: string) {
           return request.cookies.get(name)?.value
         },
-        set(name: string, value: string, options: any) {
+        set(name: string, value: string, options: CookieOptions) {
           // If the cookie is updated, update the response headers
           request.cookies.set({
             name,
@@ -35,7 +36,7 @@ export async function updateSession(request: NextRequest) {
             ...options,
           })
         },
-        remove(name: string, options: any) {
+        remove(name: string, options: CookieOptions) {
           // If the cookie is removed, update the response headers
           request.cookies.set({
             name,

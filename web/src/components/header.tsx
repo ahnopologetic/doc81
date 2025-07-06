@@ -4,11 +4,13 @@ import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { FileText, Menu, X } from "lucide-react";
+import { FileText, Menu, User, X } from "lucide-react";
+import { useAuth } from "@/lib/supabase/auth-context";
 
 export function Header() {
   const pathname = usePathname();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { user, isLoading, signOut } = useAuth();
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -42,9 +44,36 @@ export function Header() {
             <Link href="/templates" className={`text-sm font-medium ${isActive('/templates') ? 'text-[#d97757]' : 'text-gray-600 hover:text-gray-900'}`}>
               Templates
             </Link>
-            <Button className="bg-[#d97757] hover:bg-[#c86a4a] text-white">
-              Get Started
-            </Button>
+
+            {!isLoading && (
+              <>
+                {user ? (
+                  <div className="flex items-center space-x-4">
+                    <Link href="/profile">
+                      <Button variant="outline" className="flex items-center space-x-2">
+                        <User size={16} />
+                        <span>Profile</span>
+                      </Button>
+                    </Link>
+                    <Button
+                      variant="ghost"
+                      onClick={() => signOut()}
+                      className="text-gray-600 hover:text-gray-900"
+                    >
+                      Sign Out
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="flex items-center space-x-4">
+                    <Link href="/auth/login">
+                      <Button variant="outline">
+                        Get Started
+                      </Button>
+                    </Link>
+                  </div>
+                )}
+              </>
+            )}
           </nav>
 
           {/* Mobile menu button */}
@@ -67,17 +96,64 @@ export function Header() {
               Home
             </Link>
             <Link
+              href="/explore"
+              className={`block px-3 py-2 rounded-md ${isActive('/explore') ? 'bg-gray-100 text-[#d97757]' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'}`}
+              onClick={() => setIsMenuOpen(false)}
+            >
+              Explore
+            </Link>
+            <Link
+              href="/mcp"
+              className={`block px-3 py-2 rounded-md ${isActive('/mcp') ? 'bg-gray-100 text-[#d97757]' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'}`}
+              onClick={() => setIsMenuOpen(false)}
+            >
+              MCP
+            </Link>
+            <Link
               href="/templates"
               className={`block px-3 py-2 rounded-md ${isActive('/templates') ? 'bg-gray-100 text-[#d97757]' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'}`}
               onClick={() => setIsMenuOpen(false)}
             >
               Templates
             </Link>
-            <div className="px-3 py-2">
-              <Button className="w-full bg-[#d97757] hover:bg-[#c86a4a] text-white">
-                Get Started
-              </Button>
-            </div>
+
+            {!isLoading && (
+              <>
+                {user ? (
+                  <div className="space-y-2 px-3 py-2">
+                    <Link href="/profile" onClick={() => setIsMenuOpen(false)}>
+                      <Button variant="outline" className="w-full flex items-center justify-center space-x-2">
+                        <User size={16} />
+                        <span>Profile</span>
+                      </Button>
+                    </Link>
+                    <Button
+                      variant="ghost"
+                      onClick={() => {
+                        signOut();
+                        setIsMenuOpen(false);
+                      }}
+                      className="w-full text-gray-600 hover:text-gray-900"
+                    >
+                      Sign Out
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="space-y-2 px-3 py-2">
+                    <Link href="/auth/login" onClick={() => setIsMenuOpen(false)}>
+                      <Button variant="outline" className="w-full">
+                        Sign In
+                      </Button>
+                    </Link>
+                    <Link href="/auth/signup" onClick={() => setIsMenuOpen(false)}>
+                      <Button className="w-full bg-[#d97757] hover:bg-[#c86a4a] text-white">
+                        Sign Up
+                      </Button>
+                    </Link>
+                  </div>
+                )}
+              </>
+            )}
           </div>
         )}
       </div>

@@ -4,7 +4,10 @@ from fastmcp import FastMCP
 
 from doc81 import service
 
-mcp = FastMCP("Doc81 🚀")
+mcp = FastMCP(
+    "Doc81 🚀",
+    instructions="Use this server to get predefined templates for any dev documentations.",
+)
 
 
 def mcp_tool_from_service(service_func: Callable) -> Callable:

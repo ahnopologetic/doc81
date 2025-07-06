@@ -139,7 +139,7 @@ export function TemplateCarousel() {
 
                                         <div className="relative overflow-hidden">
                                             <div className="h-full">
-                                                <p className="text-sm text-gray-600 mb-2">{template.description}</p>
+                                                <Markdown remarkPlugins={[remarkGfm]}>{template.description}</Markdown>
 
                                                 <div
                                                     className={`bg-gray-50 rounded prose p-4 markdown-content h-full overflow-y-auto transition-opacity duration-300 ${isHovered ? 'opacity-100' : 'opacity-0 absolute top-0 left-0'

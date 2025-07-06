@@ -17,7 +17,7 @@ class LocalConfig(Config):
 
     prompt_dir: Path | None = Field(default=None)
     database_url: str = Field(
-        "DO_NOT_USE_THIS_CONFIG_FOR_LOCAL_MODE",
+        "sqlite:///./doc81.db",
         description="Not used for local mode",
     )
 
@@ -25,7 +25,7 @@ class LocalConfig(Config):
 class ServerConfig(Config):
     mode: Literal["server"] = "server"
     database_url: str = Field(
-        "sqlite:///./db.sqlite3", description="Database URL for server mode"
+        "sqlite:///./doc81.db", description="Database URL for server mode"
     )
     server_url: str = Field(
         "https://doc81-979490649165.us-east1.run.app",  # TODO: no hardcoded url

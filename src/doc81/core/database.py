@@ -4,17 +4,10 @@ from sqlalchemy.orm import sessionmaker, scoped_session
 
 from doc81.core.config import config
 
-# Base class for all models
 Base = declarative_base()
 
-# Database URL configuration
-DATABASE_URL = (
-    config.database_url if hasattr(config, "database_url") else "sqlite:///./doc81.db"
-)
-
-# Create engine
 engine = create_engine(
-    DATABASE_URL,
+    config.database_url,
     pool_pre_ping=True,
     echo=config.env == "dev",
 )

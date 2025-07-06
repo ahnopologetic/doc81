@@ -9,8 +9,7 @@ from doc81.rest.app import create_app
 # TODO: replace with a test config
 @pytest.fixture
 def client() -> TestClient:
-    config = ServerConfig(database_url="sqlite:///./test.db")
-
+    config = ServerConfig()
     return TestClient(create_app(config))
 
 

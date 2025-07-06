@@ -29,4 +29,14 @@ export interface GenerateTemplateParams {
 export const generateTemplate = async (params: GenerateTemplateParams): Promise<string> => {
     const response = await apiClient.post<string>(`${TEMPLATES_ENDPOINT}/generate`, params);
     return extractResponseData(response);
-}; 
+};
+
+export const likeTemplate = async (templateId: string, userId: string): Promise<void> => {
+    const response = await apiClient.post<void>(`${TEMPLATES_ENDPOINT}/${templateId}/like?user_id=${userId}`);
+    return extractResponseData(response);
+};
+
+export const unlikeTemplate = async (templateId: string, userId: string): Promise<void> => {
+    const response = await apiClient.delete<void>(`${TEMPLATES_ENDPOINT}/${templateId}/like?user_id=${userId}`);
+    return extractResponseData(response);
+};

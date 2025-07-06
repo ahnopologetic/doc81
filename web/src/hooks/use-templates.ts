@@ -7,6 +7,8 @@ import {
   generateTemplate,
   GenerateTemplateParams,
   saveTemplate,
+  likeTemplate,
+  unlikeTemplate,
 } from "@/lib/api/services";
 import { Template, TemplateCreate } from "@/lib/api/types";
 
@@ -48,4 +50,16 @@ export const useGenerateTemplate = () => {
   return useMutation<string, Error, GenerateTemplateParams>({
     mutationFn: (params: GenerateTemplateParams) => generateTemplate(params),
   });
-}; 
+};
+
+export const useLikeTemplate = () => {
+  return useMutation<void, Error, { templateId: string, userId: string }>({
+    mutationFn: ({ templateId, userId }) => likeTemplate(templateId, userId),
+  });
+};
+
+export const useUnlikeTemplate = () => {
+  return useMutation<void, Error, { templateId: string, userId: string }>({
+    mutationFn: ({ templateId, userId }) => unlikeTemplate(templateId, userId),
+  });
+};

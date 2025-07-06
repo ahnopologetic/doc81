@@ -48,6 +48,7 @@ export interface TemplateListItem {
   path: string;
   content: string;
   tags: string[];
+  like_count: number;
 }
 
 // User related types

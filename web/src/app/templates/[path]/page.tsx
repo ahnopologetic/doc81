@@ -1,27 +1,35 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useTemplate, useGenerateTemplate } from "@/hooks";
+import { Header } from "@/components/header";
+import { AvatarCircles } from "@/components/magicui/avatar-circles";
+import MarkdownCollapsibleTimeline from "@/components/markdown-collapsible-timeline";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { ArrowLeft, Download, Copy, FileText, Tag, Building, Clipboard } from "lucide-react";
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useLikeTemplate, useTemplate } from "@/hooks";
+import { useAuth } from "@/lib/supabase/auth-context";
+import { Separator } from "@radix-ui/react-select";
+import { ArrowLeft, Building, Copy, FileText, Heart, Send, Tag } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
-import { toast } from "sonner";
-import { useParams } from "next/navigation";
-import { Header } from "@/components/header";
-import MarkdownCollapsibleTimeline from "@/components/markdown-collapsible-timeline";
-import { AvatarCircles } from "@/components/magicui/avatar-circles";
-import remarkGfm from "remark-gfm";
+import { useParams, useRouter } from "next/navigation";
+import { useEffect } from "react";
 import Markdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import { toast } from "sonner";
 
 export default function TemplateDetailPage() {
+  const { user } = useAuth();
+  const router = useRouter();
   const params = useParams();
+
   const decodedPath = decodeURIComponent(params.path as string);
   const { data: template, isLoading, error } = useTemplate(decodedPath);
-  const generateTemplateMutation = useGenerateTemplate();
-
+  const { mutate: likeTemplate } = useLikeTemplate();
   // const [variables, setVariables] = useState<Record<string, string>>({});
-  const [generatedContent, setGeneratedContent] = useState<string | null>(null);
 
   // Extract variables from template content when it loads
   useEffect(() => {
@@ -46,52 +54,12 @@ export default function TemplateDetailPage() {
   //   }));
   // };
 
-  const handleGenerateTemplate = async () => {
-    try {
-      const content = await generateTemplateMutation.mutateAsync({
-        raw_markdown: template?.content || "",
-      });
-
-      setGeneratedContent(content);
-      toast.success("Template generated successfully");
-    } catch (error) {
-      toast.error("Failed to generate template");
-      console.error("Error generating template:", error);
-    }
-  };
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
     toast.success("Copied to clipboard");
   };
 
-  const downloadTemplate = () => {
-    if (generatedContent) {
-      const blob = new Blob([generatedContent], { type: 'text/markdown' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `${template?.name || 'template'}.md`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-      toast.success("Download started");
-    }
-  };
-
-  // Sample AI prompts based on the template
-  const getAIPrompts = () => {
-    if (!template) return [];
-
-    return [
-      `doc81: Help me create a ${template.name} based on best practices (ref=${template.id})`,
-      `doc81: Generate a detailed ${template.name} for my project about [YOUR_PROJECT] (ref=${template.id})`,
-      `doc81: What should I include in my ${template.name} to ensure completeness? (ref=${template.id})`,
-      `doc81: Write a ${template.name} that focuses on [SPECIFIC_ASPECT] (ref=${template.id})`,
-      `doc81: Adapt this ${template.name} template for a [YOUR_INDUSTRY] context (ref=${template.id})`
-    ];
-  };
 
   if (isLoading) {
     return (
@@ -154,50 +122,116 @@ export default function TemplateDetailPage() {
                     </div>
 
                     <MarkdownCollapsibleTimeline markdown={template.content} title="Template ToC" className="mb-6" />
-
-                    {generatedContent && (
-                      <div className="bg-gray-50 p-4 rounded-md mb-6">
-                        <div className="flex justify-between items-center mb-2">
-                          <h2 className="font-medium">Generated Template</h2>
-                          <div className="flex gap-2">
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => copyToClipboard(generatedContent)}
-                              className="flex items-center gap-1"
-                            >
-                              <Copy className="h-3 w-3" />
-                              Copy
-                            </Button>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={downloadTemplate}
-                              className="flex items-center gap-1"
-                            >
-                              <Download className="h-3 w-3" />
-                              Download
-                            </Button>
-                          </div>
-                        </div>
-                        <div className="prose max-w-none bg-white p-4 rounded border border-gray-200 overflow-auto max-h-[400px]">
-                          <pre className="whitespace-pre-wrap text-sm">
-                            {generatedContent}
-                          </pre>
-                        </div>
-                      </div>
-                    )}
                   </CardContent>
                 </Card>
               </div>
 
               <div className="space-y-6">
                 <Card>
-                  <CardContent className="p-6">
-                    <h2 className="text-xl font-semibold mb-4">Template Information</h2>
+                  <CardContent className="p-4 px-6">
+                    <div className="grid grid-cols-1 gap-4">
+                      <Label>
+                        Actions
+                      </Label>
+                      <div className="grid grid-cols-4 gap-2">
+                        <div className="col-span-3">
 
-                    <div className="space-y-4">
-                      <div className="flex items-center gap-2">
+                          <Select defaultValue="cursor">
+                            <SelectTrigger className="w-full bg-white hover:bg-white col-span-3">
+                              {/* <BotIcon className="h-4 w-4" /> */}
+                              <SelectValue placeholder="Select an option" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="cursor">
+                                <div className="flex items-center gap-2">
+                                  <Image src={`https://img.logo.dev/cursor.com?token=${process.env.NEXT_PUBLIC_LOGO_DEV_TOKEN}&size=50&retina=true`} alt="Cursor" width={20} height={20} />
+                                  Cursor
+                                </div>
+                              </SelectItem>
+                              <SelectItem value="claude">
+                                <div className="flex items-center gap-2">
+                                  <Image src={`https://img.logo.dev/claude.com?token=${process.env.NEXT_PUBLIC_LOGO_DEV_TOKEN}&size=50&retina=true`} alt="Claude" width={20} height={20} />
+                                  Claude
+                                </div>
+                              </SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div className="grid grid-cols-2 gap-2 items-center col-span-1">
+                          <HoverCard>
+                            <HoverCardTrigger>
+                              <Button variant="ghost" size="sm" className="w-full cursor-pointer" onClick={async () => {
+                                copyToClipboard(`doc81: Start writing a ${template.name} based on best practices (ref=${template.id})`);
+                                if (user) {
+                                  await likeTemplate({ templateId: template.id, userId: user.id }, {
+                                    onSuccess: () => {
+                                      toast.success("Liked template", {
+                                        icon: <Heart className="w-4 h-4 text-green-500" />,
+                                      });
+                                    },
+                                    onError: () => {
+                                      toast.error("Failed to like template", {
+                                        icon: <Heart className="w-4 h-4 text-red-500" />,
+                                      });
+                                    },
+                                  });
+                                }
+                                await new Promise(resolve => setTimeout(resolve, 1000));
+                                router.push('cursor://anysphere.cursor-deeplink')
+                              }}>
+                                <Send className="h-4 w-4" />
+                              </Button>
+                            </HoverCardTrigger>
+                            <HoverCardContent className="w-80">
+                              <div className="flex justify-between gap-4">
+                                <Avatar>
+                                  <AvatarImage src={`https://img.logo.dev/cursor.com?token=${process.env.NEXT_PUBLIC_LOGO_DEV_TOKEN}&size=50&retina=true`} />
+                                  <AvatarFallback>
+                                    <Image src={`https://img.logo.dev/cursor.com?token=${process.env.NEXT_PUBLIC_LOGO_DEV_TOKEN}&size=50&retina=true`} alt="Cursor" width={20} height={20} />
+                                  </AvatarFallback>
+                                </Avatar>
+                                <div className="flex flex-col gap-2">
+                                  <p className="text-sm font-bold">
+                                    Copy and paste this into your cursor chat
+                                  </p>
+                                  <p className="text-sm text-gray-500 font-mono code bg-gray-100 p-2 rounded-md">
+                                    doc81: Start writing a {template.name} based on best practices (ref={template.id})
+                                  </p>
+                                  <p className="text-sm text-gray-500">
+                                    But before that, <br />
+                                    Did you setup doc81 MCP? <Link href="/mcp" className="underline">Learn more</Link>
+                                  </p>
+                                </div>
+                              </div>
+                            </HoverCardContent>
+                          </HoverCard>
+                          <Button variant="ghost" size="sm" className="w-full cursor-pointer" onClick={() => {
+                            if (!user) {
+                              toast.error("Please login to copy raw markdown to clipboard", {
+                                icon: <FileText className="h-4 w-4" />,
+                                action: {
+                                  label: "Login",
+                                  onClick: () => {
+                                    router.push('/auth/login');
+                                  }
+                                }
+                              });
+                              return;
+                            }
+                            copyToClipboard(template.content)
+                          }}>
+                            <Copy className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+                      <p className="text-sm text-gray-500">
+                        Did you setup doc81 MCP? <Link href="/mcp" className="underline">Learn more</Link>
+                      </p>
+                      <Separator />
+                      <Label>
+                        Template Details
+                      </Label>
+                      <div className="grid grid-cols-[auto_1fr] gap-2 items-center">
                         <FileText className="h-4 w-4 text-gray-500" />
                         <div>
                           <p className="text-sm text-gray-500">Template Name</p>
@@ -206,7 +240,7 @@ export default function TemplateDetailPage() {
                       </div>
 
                       {template.description && (
-                        <div className="flex items-start gap-2">
+                        <div className="grid grid-cols-[auto_1fr] gap-2 items-start">
                           <FileText className="h-4 w-4 text-gray-500 mt-0.5" />
                           <div>
                             <p className="text-sm text-gray-500">Description</p>
@@ -215,7 +249,7 @@ export default function TemplateDetailPage() {
                         </div>
                       )}
 
-                      <div className="flex items-center gap-2">
+                      <div className="grid grid-cols-[auto_1fr] gap-2 items-center">
                         <Tag className="h-4 w-4 text-gray-500" />
                         <div>
                           <p className="text-sm text-gray-500">Tags</p>
@@ -230,7 +264,7 @@ export default function TemplateDetailPage() {
                       </div>
 
                       {template.tags.filter(tag => tag.startsWith("company:")).length > 0 && (
-                        <div className="flex items-center gap-2">
+                        <div className="grid grid-cols-[auto_1fr] gap-2 items-center">
                           <Building className="h-4 w-4 text-gray-500" />
                           <div>
                             <p className="text-sm text-gray-500">Used by Companies</p>
@@ -243,44 +277,6 @@ export default function TemplateDetailPage() {
                       )}
                     </div>
 
-                    <Button
-                      onClick={handleGenerateTemplate}
-                      className="w-full bg-[#d97757] hover:bg-[#c86a4a] text-white mt-6"
-                      disabled={generateTemplateMutation.isPending}
-                    >
-                      {generateTemplateMutation.isPending ? "Generating..." : "Generate Template"}
-                    </Button>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardContent className="p-6">
-                    <h2 className="text-xl font-semibold mb-4">Start Writing in Cursor</h2>
-                    <p className="text-gray-600 text-sm mb-4">
-                      Copy one of these prompts to get started with AI assistance in Cursor:
-                    </p>
-
-                    <div className="space-y-3">
-                      {(() => {
-                        const prompts = getAIPrompts();
-                        const randomPrompt = prompts[Math.floor(Math.random() * prompts.length)];
-                        return (
-                          <div
-                            className="bg-white border border-gray-200 rounded-md p-3 flex justify-between items-center hover:bg-gray-50 transition-colors"
-                          >
-                            <p className="text-sm code bg-gray-100 p-2 rounded-md">{randomPrompt}</p>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => copyToClipboard(randomPrompt)}
-                              className="h-8 w-8 p-0"
-                            >
-                              <Clipboard className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        );
-                      })()}
-                    </div>
                   </CardContent>
                 </Card>
               </div>
@@ -288,6 +284,6 @@ export default function TemplateDetailPage() {
           </div>
         </div>
       </div>
-    </div>
+    </div >
   );
 } 

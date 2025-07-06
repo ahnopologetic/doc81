@@ -12,19 +12,57 @@ import { TemplateListItem } from "@/lib/api/types";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { AvatarCircles } from "@/components/magicui/avatar-circles";
+import { likeTemplate, unlikeTemplate } from "@/lib/api/services/templates";
+import { toast } from "sonner";
+import { useAuth } from "@/lib/supabase/auth-context";
 
 export default function TemplatesPage() {
+  const { user } = useAuth();
   const router = useRouter();
   const [likedTemplates, setLikedTemplates] = useState<Set<string>>(new Set());
 
   // Fetch templates data
-  const { data: templates, isLoading, error } = useTemplates();
+  const { data: templates, isLoading, error, refetch } = useTemplates();
 
   // Split templates into user's templates and public templates
   const userTemplates = templates?.filter(template => template.tags.includes("user")) || [];
   const publicTemplates = templates?.filter(template => !template.tags.includes("user")) || [];
 
-  const toggleLike = (templateId: string) => {
+  const toggleLike = async (templateId: string) => {
+    if (!user) {
+      toast.error("Please login to like templates", {
+        icon: <Heart className="w-4 h-4 text-red-500" />,
+        action: {
+          label: "Login",
+          onClick: () => {
+            router.push("/auth/login");
+          },
+        },
+      });
+      return;
+    }
+    if (likedTemplates.has(templateId)) {
+      await unlikeTemplate(templateId, user.id);
+      toast.success("Unliked template", {
+        icon: <Heart className="w-4 h-4 text-red-500" />,
+      });
+    } else {
+      try {
+        await likeTemplate(templateId, user.id);
+        toast.success("Liked template", {
+          icon: <Heart className="w-4 h-4 text-green-500" />,
+        });
+      } catch (error) {
+        toast.error("Failed to like template", {
+          icon: <Heart className="w-4 h-4 text-red-500" />,
+          description: `Error: ${error instanceof Error ? error.message : "Unknown error"}`,
+          action: {
+            label: "Retry",
+            onClick: () => toggleLike(templateId),
+          },
+        });
+      }
+    }
     setLikedTemplates((prev) => {
       const newSet = new Set(prev);
       if (newSet.has(templateId)) {
@@ -34,6 +72,7 @@ export default function TemplatesPage() {
       }
       return newSet;
     });
+    refetch();
   };
 
   const renderTemplateCard = (template: TemplateListItem) => {
@@ -91,7 +130,7 @@ export default function TemplatesPage() {
               <div className="flex items-center space-x-4 text-sm text-gray-500">
                 <div className="flex items-center space-x-1">
                   <Heart className="w-4 h-4" />
-                  <span>{Math.floor(Math.random() * 100)}</span>
+                  <span>{template.like_count}</span>
                 </div>
               </div>
               <Button

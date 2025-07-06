@@ -6,7 +6,9 @@ import {
   getTemplate,
   generateTemplate,
   GenerateTemplateParams,
+  saveTemplate,
 } from "@/lib/api/services";
+import { Template, TemplateCreate } from "@/lib/api/types";
 
 // Query keys
 export const templateKeys = {
@@ -31,6 +33,13 @@ export const useTemplate = (id: string) => {
     queryKey: templateKeys.detail(id),
     queryFn: () => getTemplate(id),
     enabled: !!id,
+  });
+};
+
+// Hook for saving a template
+export const useSaveTemplate = () => {
+  return useMutation<Template, Error, TemplateCreate>({
+    mutationFn: (template: TemplateCreate) => saveTemplate(template),
   });
 };
 

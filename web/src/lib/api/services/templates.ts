@@ -1,5 +1,5 @@
 import { apiClient, extractResponseData } from "../client";
-import { Template, TemplateListItem } from "../types";
+import { Template, TemplateCreate, TemplateListItem } from "../types";
 
 // Templates API endpoints
 const TEMPLATES_ENDPOINT = "/templates";
@@ -13,6 +13,11 @@ export const getTemplates = async (): Promise<TemplateListItem[]> => {
 // Get template by path or reference
 export const getTemplate = async (pathOrRef: string): Promise<Template> => {
     const response = await apiClient.get<Template>(`${TEMPLATES_ENDPOINT}/${pathOrRef}`);
+    return extractResponseData(response);
+};
+
+export const saveTemplate = async (template: TemplateCreate): Promise<Template> => {
+    const response = await apiClient.post<Template>(`${TEMPLATES_ENDPOINT}/`, template);
     return extractResponseData(response);
 };
 

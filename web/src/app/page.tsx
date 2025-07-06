@@ -76,7 +76,7 @@ export default function LandingPage() {
             Browse our collection of professional templates for various documentation needs
           </p>
         </div>
-        
+
         <div className="max-w-5xl mx-auto h-full">
           <TemplateCarousel />
         </div>
@@ -96,8 +96,8 @@ export default function LandingPage() {
                 {/* File Upload Area */}
                 <div
                   className={`border-2 border-dashed rounded-lg p-8 text-center transition-all duration-200 ${isDragOver
-                      ? "border-[#d97757] bg-orange-50"
-                      : "border-gray-300 hover:border-[#d97757] hover:bg-orange-50/50"
+                    ? "border-[#d97757] bg-orange-50"
+                    : "border-gray-300 hover:border-[#d97757] hover:bg-orange-50/50"
                     }`}
                   onDragOver={handleDragOver}
                   onDragLeave={handleDragLeave}
@@ -164,7 +164,6 @@ Start typing your markdown content here...
         </div>
       </section>
 
-      {/* Canvas Component */}
       <MarkdownCanvas
         isOpen={showCanvas}
         onClose={() => setShowCanvas(false)}

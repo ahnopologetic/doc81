@@ -33,6 +33,14 @@ export interface Template {
   tags: string[];
 }
 
+export interface TemplateCreate {
+  name: string;
+  description?: string;
+  content: string;
+  path?: string;
+  tags?: string[];
+}
+
 export interface TemplateListItem {
   id: string;
   name: string;

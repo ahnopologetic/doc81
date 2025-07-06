@@ -119,7 +119,7 @@ export function TemplateCarousel() {
                 <ChevronRight className="h-6 w-6" />
             </Button>
 
-            <div className="h-full overflow-hidden" ref={viewportRef}>
+            <div className="h-full" ref={viewportRef}>
                 <div className="flex">
                     {templates.map((template) => {
                         const isHovered = hoveredTemplate === template.id;

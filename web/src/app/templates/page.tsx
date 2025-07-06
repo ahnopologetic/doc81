@@ -39,7 +39,7 @@ export default function TemplatesPage() {
   const renderTemplateCard = (template: TemplateListItem) => {
     const isLiked = likedTemplates.has(template.id);
     const companyTags = template.tags.filter(tag => tag.startsWith("company:"));
-    const restTags = template.tags.filter(tag => !tag.startsWith("company:"));
+    const restTags = template.tags.filter(tag => !tag.startsWith("company:")).map(tag => `#${tag}`);
 
     return (
       <Card

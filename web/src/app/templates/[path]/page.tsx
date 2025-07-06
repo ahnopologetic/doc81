@@ -205,7 +205,7 @@ export default function TemplateDetailPage() {
                               </div>
                             </HoverCardContent>
                           </HoverCard>
-                          <Button variant="ghost" size="sm" className="w-full cursor-pointer" onClick={() => {
+                          <Button variant="ghost" size="sm" className="w-full cursor-pointer" onClick={async () => {
                             if (!user) {
                               toast.error("Please login to copy raw markdown to clipboard", {
                                 icon: <FileText className="h-4 w-4" />,
@@ -219,6 +219,19 @@ export default function TemplateDetailPage() {
                               return;
                             }
                             copyToClipboard(template.content)
+                            await likeTemplate({ templateId: template.id, userId: user.id }, {
+                              onSuccess: () => {
+                                toast.success("Liked template", {
+                                  icon: <Heart className="w-4 h-4 text-green-500" />,
+                                });
+                              },
+                              onError: (error) => {
+                                toast.error("Failed to like template", {
+                                  icon: <Heart className="w-4 h-4 text-red-500" />,
+                                  description: error.message,
+                                });
+                              },
+                            });
                           }}>
                             <Copy className="h-4 w-4" />
                           </Button>

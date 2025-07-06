@@ -3,7 +3,6 @@ from fastapi.concurrency import asynccontextmanager
 from fastapi.middleware.cors import CORSMiddleware
 
 from doc81.core.config import ServerConfig
-from doc81.core.database import init_db
 from doc81.rest.routes import health, users, templates, companies
 
 
@@ -12,6 +11,8 @@ def create_app(config: ServerConfig | None = None) -> FastAPI:
 
     @asynccontextmanager
     async def lifespan(app: FastAPI):
+        from doc81.core.database import init_db
+
         init_db()
         yield
 

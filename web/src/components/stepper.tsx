@@ -477,6 +477,7 @@ const getStepState = (currentIndex: number, stepIndex: number) => {
   return "inactive";
 };
 
+// eslint-disable-next-line @typescript-eslint/no-namespace
 namespace Stepper {
   export type StepperVariant = "horizontal" | "vertical" | "circle";
   export type StepperLabelOrientation = "horizontal" | "vertical";

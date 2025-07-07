@@ -1,11 +1,15 @@
 from typing import Callable
 
+from doc81 import __version__
+
 from fastmcp import FastMCP
 
 from doc81 import service
 
+
 mcp = FastMCP(
     "Doc81 🚀",
+    version=__version__,
     instructions="Use this server to get predefined templates for any dev documentations.",
 )
 
@@ -34,7 +38,7 @@ def list_templates() -> list[str]:
 
 
 @mcp_tool_from_service
-def get_template(path_or_ref: str) -> dict[str, str | list[str]]:
+def get_template(path_or_ref: str) -> dict[str, str | list[str] | int | float]:
     return service.get_template(path_or_ref)
 
 

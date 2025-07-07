@@ -1,6 +1,19 @@
 # Doc81 🚀
 
-Doc81 is a developer document template platform that helps you create, manage, and use document templates proven by many experts. It provides both a local mode for working with templates on your filesystem and a server mode for accessing templates out there.
+Doc81 is a tech documentation tool (web, mcp) designed in AI-native mind that helps you create, manage, and use document templates proven by many experts. It provides both a local mode for working with templates on your filesystem and a server mode for accessing templates out there.
+
+### Background
+> Started this idea from the moment when, as a manager, I asked for a "good" handoff documentation from our engineer who's leaving soon. The first doc was crappy. I wrote what each part needs to include, and so forth, and the experience turns out to be awesome for both of us. 
+
+> My takeaway was **to share and consistently develop a good structure** for dev doc. I believe doc81 is a good start.
+
+
+
+### Usecase
+- **General developers**: Pick a good documentation template from [doc81 web](https://doc81.ahnopologetic.xyz/) and start writing a doc using the template by using MCP. (See [MCP on doc81 web](https://doc81.ahnopologetic.xyz/mcp) for more detail) 
+- **Dev writers**: Turn your technical documentations into reusable document templates on [doc81 web](https://doc81.ahnopologetic.xyz) "Turn your document into AI powered templates" section. 
+- **Security-concerned SWEs**: Use [doc81 MCP local mode](https://doc81.ahnopologetic.xyz/mcp) to start writing from your local templates without pulling data from server or pushing to the external world. Stay focused. 
+
 
 ## Features
 
@@ -9,15 +22,8 @@ Doc81 is a developer document template platform that helps you create, manage, a
 - MCP (Model Control Protocol) integration for AI assistant compatibility
 - API server for general usage
 
-## Installation
-
-### Prerequisites
-
-- Python 3.10+
-- pip or pipenv
 
 ### Quick Start
-
 #### MCP (recommended)
 ##### Cursor (default)
 1. setup MCP
@@ -29,7 +35,12 @@ Doc81 is a developer document template platform that helps you create, manage, a
 This command add .cursor/rules/doc81.mdc.
 This prompt will guide cursor how to ask and do the work for you.
 
-2. add MCP
+2. add MCP  
+
+Use our MCP one-click install from [doc81 web MCP page](https://doc81.ahnopologetic.xyz/mcp)
+
+
+Or you can manually edit JSON
 ```json
 // mcp.json`
 {
@@ -62,6 +73,10 @@ cursor: Get template (function call)
 
 Let me copy the runbook template to your-new-doc.md. ...
 ```
+
+#### Web
+Please navigate [Doc81 web](https://doc81.ahnopologetic.xyz/).
+
 
 ## Usage
 
@@ -96,6 +111,12 @@ Doc81 can be configured using environment variables:
 - `DOC81_PROMPT_DIR` - Directory containing templates (default: project's prompts directory)
 
 ## Development
+Please leave your feedback or places that need improvement in Github Issues.
+
+### Prerequisites
+
+- Python 3.10+
+- pip or pipenv
 
 ### Testing
 

@@ -22,7 +22,7 @@ import remarkGfm from "remark-gfm";
 import { toast } from "sonner";
 
 const COPYRIGHT_HEADER = `{/* 
-This template is copyrighted by Doc81 (https://doc81.vercel.app/; https://github.com/ahnopologetic/doc81).
+This template is copyrighted by Doc81 (https://doc81.ahnopologetic.xyz/; https://github.com/ahnopologetic/doc81).
 You are free to use this template for your own purposes, but you must give credit to Doc81.
 */}
 `

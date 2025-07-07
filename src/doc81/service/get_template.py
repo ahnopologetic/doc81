@@ -1,7 +1,7 @@
 from pathlib import Path
 
 import requests
-from doc81.core.config import Config, LocalConfig, ServerConfig, config as global_config
+from doc81.core.config import Config, config as global_config
 from doc81.core.exception import Doc81ServiceException
 from doc81.core.schema import Doc81Template, TemplateSchema
 import frontmatter
@@ -29,7 +29,7 @@ def get_template(
         return _get_template_from_path(path_or_ref, config).model_dump()
 
 
-def _get_template_from_url(ref: str, config: ServerConfig) -> TemplateSchema:
+def _get_template_from_url(ref: str, config: Config) -> TemplateSchema:
     url = f"{config.server_url}/templates/{ref}"
     response = requests.get(url)
     response.raise_for_status()
@@ -37,7 +37,7 @@ def _get_template_from_url(ref: str, config: ServerConfig) -> TemplateSchema:
     return TemplateSchema(**response.json())
 
 
-def _get_template_from_path(path: str, config: LocalConfig) -> Doc81Template:
+def _get_template_from_path(path: str, config: Config) -> Doc81Template:
     try:
         ppath = Path(config.prompt_dir / path)
     except FileNotFoundError:

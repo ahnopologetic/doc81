@@ -89,7 +89,7 @@ export default function LandingPage() {
             <CardContent className="p-8">
               <div className="space-y-6">
                 <div className="text-center">
-                  <h2 className="text-2xl font-semibold text-gray-900 mb-2">Get Started with Your Markdown</h2>
+                  <h2 className="text-2xl font-semibold text-gray-900 mb-2">Turn your documents into AI-powered templates</h2>
                   <p className="text-gray-600">Type your content below or upload a markdown file to begin</p>
                 </div>
 

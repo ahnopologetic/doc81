@@ -1,16 +1,16 @@
 import pytest
 from fastapi.testclient import TestClient
 
-from doc81.core.config import ServerConfig
 from doc81.core.schema import Doc81Template
 from doc81.rest.app import create_app
+from tests.utils import override_env
 
 
 # TODO: replace with a test config
 @pytest.fixture
 def client() -> TestClient:
-    config = ServerConfig()
-    return TestClient(create_app(config))
+    with override_env(DOC81_MODE="server"):
+        return TestClient(create_app())
 
 
 @pytest.fixture
@@ -44,13 +44,13 @@ def mock_templates():
 class TestTemplatesEndpoints:
     """Tests for template management endpoints"""
 
-    def test_list_templates(self, client):
+    def test_list_templates(self, client: TestClient):
         """Test GET /templates endpoint"""
         response = client.get("/templates")
 
         assert response.status_code == 200
 
-    def test_list_templates_empty(self, client):
+    def test_list_templates_empty(self, client: TestClient):
         """Test GET /templates when no templates exist"""
         # Execute request
         response = client.get("/templates")
@@ -176,7 +176,7 @@ class TestUserTemplatesEndpoints:
 class TestTemplateDetailsEndpoints:
     """Tests for template details endpoints"""
 
-    def test_get_template(self, client: TestClient, mock_template):
+    def test_get_template(self, client: TestClient):
         """Test GET /templates/{template_id} endpoint"""
         template_id = "template-123"
 
@@ -192,7 +192,7 @@ class TestTemplateDetailsEndpoints:
         """Test GET /templates/{template_id} with non-existent template"""
         template_id = "non-existent"
 
-        response = client.get(f"/templates/{template_id}")
+        response = client.get(f"/templates/{template_id}/")
 
         assert response.status_code == 404
         error = response.json()
@@ -203,7 +203,7 @@ class TestTemplateDetailsEndpoints:
 class TestTemplateGenerationEndpoints:
     """Tests for template generation endpoints"""
 
-    def test_generate_template(self):
+    def test_generate_template(self, client: TestClient):
         """Test POST /templates/generate endpoint"""
         generate_data = {
             "raw_markdown": "# Test Document\n\nThis is a test document.",
@@ -218,7 +218,7 @@ class TestTemplateGenerationEndpoints:
         assert "---" in result["template"]
         assert "{{title}}" in result["template"]
 
-    def test_generate_template_invalid_model(self):
+    def test_generate_template_invalid_model(self, client: TestClient):
         """Test POST /templates/generate with invalid model"""
         generate_data = {
             "raw_markdown": "# Test Document\n\nThis is a test document.",
@@ -232,7 +232,7 @@ class TestTemplateGenerationEndpoints:
         error = response.json()
         assert "detail" in error
 
-    def test_generate_template_empty_markdown(self):
+    def test_generate_template_empty_markdown(self, client: TestClient):
         """Test POST /templates/generate with empty markdown"""
         generate_data = {"raw_markdown": "", "model": "openai/gpt-4o-mini"}
 
@@ -243,7 +243,7 @@ class TestTemplateGenerationEndpoints:
         error = response.json()
         assert "detail" in error
 
-    def test_generate_template_service_error(self):
+    def test_generate_template_service_error(self, client: TestClient):
         """Test POST /templates/generate with service error"""
         generate_data = {
             "raw_markdown": "# Test Document\n\nThis is a test document.",

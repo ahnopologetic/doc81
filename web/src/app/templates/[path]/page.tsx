@@ -21,6 +21,12 @@ import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { toast } from "sonner";
 
+const COPYRIGHT_HEADER = `{/* 
+This template is copyrighted by Doc81 (https://doc81.vercel.app/; https://github.com/ahnopologetic/doc81).
+You are free to use this template for your own purposes, but you must give credit to Doc81.
+*/}
+`
+
 export default function TemplateDetailPage() {
   const { user } = useAuth();
   const router = useRouter();
@@ -218,7 +224,7 @@ export default function TemplateDetailPage() {
                               });
                               return;
                             }
-                            copyToClipboard(template.content)
+                            copyToClipboard(COPYRIGHT_HEADER + template.content)
                             await likeTemplate({ templateId: template.id, userId: user.id }, {
                               onSuccess: () => {
                                 toast.success("Liked template", {

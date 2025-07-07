@@ -2,12 +2,12 @@ from fastapi import FastAPI
 from fastapi.concurrency import asynccontextmanager
 from fastapi.middleware.cors import CORSMiddleware
 
-from doc81.core.config import ServerConfig
+from doc81.core.config import Config
 from doc81.rest.routes import health, users, templates, companies
 
 
-def create_app(config: ServerConfig | None = None) -> FastAPI:
-    config = config or ServerConfig(mode="server")
+def create_app() -> FastAPI:
+    config = Config()
 
     @asynccontextmanager
     async def lifespan(app: FastAPI):

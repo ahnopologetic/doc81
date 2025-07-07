@@ -4,6 +4,7 @@ import requests
 from doc81.core.config import Config, config as global_config
 from doc81.core.exception import Doc81ServiceException
 from doc81.core.schema import Doc81Template, TemplateSchema
+from pydantic import ValidationError
 import frontmatter
 
 
@@ -34,7 +35,11 @@ def _get_template_from_url(ref: str, config: Config) -> TemplateSchema:
     response = requests.get(url)
     response.raise_for_status()
 
-    return TemplateSchema.model_validate(response.json())
+    print(f"{response.json()=}")
+    try:
+        return TemplateSchema.model_validate(response.json())
+    except ValidationError as e:
+        raise Doc81ServiceException(f"Invalid template: {e}")
 
 
 def _get_template_from_path(path: str, config: Config) -> Doc81Template:

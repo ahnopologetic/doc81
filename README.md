@@ -2,12 +2,13 @@
 
 Doc81 is a tech documentation tool (web, mcp) designed in AI-native mind that helps you create, manage, and use document templates proven by many experts. It provides both a local mode for working with templates on your filesystem and a server mode for accessing templates out there.
 
+https://github.com/user-attachments/assets/92f0b01f-bf47-4962-9970-f34461254275
+
+
 ### Background
 > Started this idea from the moment when, as a manager, I asked for a "good" handoff documentation from our engineer who's leaving soon. The first doc was crappy. I wrote what each part needs to include, and so forth, and the experience turns out to be awesome for both of us. 
 
 > My takeaway was **to share and consistently develop a good structure** for dev doc. I believe doc81 is a good start.
-
-
 
 ### Usecase
 - **General developers**: Pick a good documentation template from [doc81 web](https://doc81.ahnopologetic.xyz/) and start writing a doc using the template by using MCP. (See [MCP on doc81 web](https://doc81.ahnopologetic.xyz/mcp) for more detail) 
@@ -39,6 +40,7 @@ This prompt will guide cursor how to ask and do the work for you.
 
 Use our MCP one-click install from [doc81 web MCP page](https://doc81.ahnopologetic.xyz/mcp)
 
+https://github.com/user-attachments/assets/13dc0f13-74ef-493f-a0e6-154b25042151
 
 Or you can manually edit JSON
 ```json

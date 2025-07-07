@@ -154,10 +154,8 @@ async def like_template(
     )
 
     if existing_like:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail={"error": "User already liked this template"},
-        )
+        print("User already liked this template")
+        return template
 
     # Create like
     like = TemplateLike(template_id=template_id, user_id=user_id)

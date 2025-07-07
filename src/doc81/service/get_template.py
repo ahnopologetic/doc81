@@ -34,7 +34,7 @@ def _get_template_from_url(ref: str, config: Config) -> TemplateSchema:
     response = requests.get(url)
     response.raise_for_status()
 
-    return TemplateSchema(**response.json())
+    return TemplateSchema.model_validate(response.json())
 
 
 def _get_template_from_path(path: str, config: Config) -> Doc81Template:
